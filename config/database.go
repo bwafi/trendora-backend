@@ -29,10 +29,7 @@ func ConnectDB() *gorm.DB {
 	dbConfig := LoadDatabase()
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.DatabaseName, dbConfig.Port)
-	fmt.Println(dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	fmt.Println(err)
-
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to database: %v", err))
 	}
