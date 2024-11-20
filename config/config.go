@@ -29,9 +29,8 @@ func init() {
 }
 
 func GetEnv(key, defaultValue string) string {
-	result := os.Getenv(key)
-	if result == "" {
-		return defaultValue
+	if value := os.Getenv(key); value != "" {
+		return value
 	}
-	return result
+	return defaultValue
 }
