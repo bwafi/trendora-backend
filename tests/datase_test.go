@@ -2,8 +2,8 @@ package tests_test
 
 import (
 	"testing"
-	"trendora/config"
 
+	"github.com/bwafi/trendora-backend/config"
 	"github.com/stretchr/testify/assert"
 )
 

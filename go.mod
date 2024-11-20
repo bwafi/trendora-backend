@@ -1,4 +1,4 @@
-module trendora
+module github.com/bwafi/trendora-backend
 
 go 1.23.2
 
