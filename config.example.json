@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "trendora-backend"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "postgres",
+    "password": "",
+    "host": "localhost",
+    "port": 5432,
+    "name": "trendora-backenddb",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}
