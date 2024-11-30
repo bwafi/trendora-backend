@@ -1,9 +1,12 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Customers struct {
-	ID           string         `gorm:"primaryKey;column:id"`
+	ID           uuid.UUID      `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
 	EmailAddress string         `gorm:"column:email_address"`
 	PhoneNumber  string         `gorm:"column:phone_number"`
 	Password     string         `gorm:"column:password"`
