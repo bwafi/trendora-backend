@@ -7,6 +7,7 @@ type Customers struct {
 	EmailAddress string         `gorm:"column:email_address"`
 	PhoneNumber  string         `gorm:"column:phone_number"`
 	Password     string         `gorm:"column:password"`
+	Token        string         `gorm:"column:token"`
 	CreatedAt    int64          `gorm:"column:craeted_at;autoCreateTime:milli;"`
 	UpdatedAt    int64          `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 	DeletedAt    gorm.DeletedAt `gorm:"column:deleted_at;index"`
