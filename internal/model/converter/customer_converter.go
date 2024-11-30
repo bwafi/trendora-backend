@@ -1,0 +1,15 @@
+package converter
+
+import (
+	"github.com/bwafi/trendora-backend/internal/entity"
+	"github.com/bwafi/trendora-backend/internal/model"
+)
+
+func CustomerToResposne(customer *entity.Customers) *model.CustomerResponse {
+	return &model.CustomerResponse{
+		ID:        customer.ID,
+		Name:      customer.Name,
+		CreatedAt: customer.CreatedAt,
+		UpdatedAt: customer.UpdatedAt,
+	}
+}

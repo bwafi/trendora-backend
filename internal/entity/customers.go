@@ -6,7 +6,7 @@ import (
 )
 
 type Customers struct {
-	ID           uuid.UUID      `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
+	ID           string         `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
 	EmailAddress string         `gorm:"column:email_address"`
 	PhoneNumber  string         `gorm:"column:phone_number"`
 	Name         string         `gorm:"column:phone_number;not null"`
@@ -21,4 +21,9 @@ type Customers struct {
 
 func (c *Customers) TableName() string {
 	return "customers"
+}
+
+func (c *Customers) BeforeCreate(tx *gorm.DB) (err error) {
+	c.ID = uuid.New().String()
+	return
 }
