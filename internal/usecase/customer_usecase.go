@@ -40,19 +40,19 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	err := c.Validate.Struct(request)
 	if err != nil {
 		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	if request.EmailAddress != "" {
 		exists, err := c.CustomersRepository.ExistsByEmail(tx, request.EmailAddress)
 		if err != nil {
 			c.Log.Warnf("Failed to check email existence : %+v", err)
-			return nil, fiber.ErrInternalServerError
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 		}
 
 		if exists > 0 {
 			c.Log.Warnf("Email already in use : %+v", err)
-			return nil, fiber.ErrConflict
+			return nil, fiber.NewError(fiber.StatusBadRequest, "Email already in use")
 		}
 	}
 
@@ -60,18 +60,18 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		exists, err := c.CustomersRepository.ExistsByPhoneNumber(tx, request.PhoneNumber)
 		if err != nil {
 			c.Log.Warnf("Failed to check phone number existence : %+v", err)
-			return nil, fiber.ErrInternalServerError
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 		}
 
 		if exists > 0 {
 			c.Log.Warnf("Phone number already in use : %+v", err)
-			return nil, fiber.ErrConflict
+			return nil, fiber.NewError(fiber.StatusBadRequest, "Phone number already in use")
 		}
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	customer := &entity.Customers{
@@ -85,12 +85,12 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 
 	if err := c.CustomersRepository.Create(tx, customer); err != nil {
 		c.Log.Warnf("Failed create user to database : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	return converter.CustomerToResposne(customer), nil
