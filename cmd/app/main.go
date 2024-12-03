@@ -11,6 +11,17 @@ import (
 func main() {
 	viper := config.NewViper()
 	app := config.NewFiber(viper)
+	logger := config.NewLogger(viper)
+	db := config.NewDatabase(viper, logger)
+	validate := config.NewValidation()
+
+	config.Bootstrap(&config.BootstrapConfig{
+		DB:       db,
+		App:      app,
+		Log:      logger,
+		Validate: validate,
+		Config:   viper,
+	})
 
 	webPort := viper.GetInt("web.port")
 	fmt.Println(webPort)

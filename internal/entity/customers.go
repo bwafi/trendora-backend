@@ -9,7 +9,7 @@ type Customers struct {
 	ID           string         `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
 	EmailAddress string         `gorm:"column:email_address"`
 	PhoneNumber  string         `gorm:"column:phone_number"`
-	Name         string         `gorm:"column:phone_number;not null"`
+	Name         string         `gorm:"column:name;not null"`
 	Gender       bool           `gorm:"column:gender"`
 	DateOfBirth  int64          `gorm:"column:date_of_birth"`
 	Password     string         `gorm:"column:password;not null"`

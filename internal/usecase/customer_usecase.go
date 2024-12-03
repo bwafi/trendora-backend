@@ -3,11 +3,11 @@ package usecase
 import (
 	"context"
 
-	"github.com/bwafi/trendora-backend/internal/config"
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/model/converter"
 	"github.com/bwafi/trendora-backend/internal/repository"
+	"github.com/bwafi/trendora-backend/pkg"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
@@ -23,9 +23,6 @@ type CustomerUseCase struct {
 }
 
 func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, customersRepository *repository.CustomersRepository) *CustomerUseCase {
-	// register validation phone and email
-	validate.RegisterStructValidation(config.MustValidRegisterCustomer, model.CustomerRegisterRequest{})
-
 	return &CustomerUseCase{
 		DB:                  db,
 		Log:                 log,
@@ -38,6 +35,8 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
+	// register validation phone and email
+	c.Validate.RegisterStructValidation(pkg.MustValidRegisterCustomer, model.CustomerRegisterRequest{})
 	err := c.Validate.Struct(request)
 	if err != nil {
 		c.Log.Warnf("Invalid request body : %+v", err)
@@ -84,12 +83,12 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		Gender:       request.Gender,
 	}
 
-	if err := c.CustomersRepository.Create(tx, *customer); err != nil {
+	if err := c.CustomersRepository.Create(tx, customer); err != nil {
 		c.Log.Warnf("Failed create user to database : %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
