@@ -40,7 +40,9 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	err := c.Validate.Struct(request)
 	if err != nil {
 		c.Log.Warnf("Invalid request body : %+v", err)
-		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
 	}
 
 	if request.EmailAddress != "" {

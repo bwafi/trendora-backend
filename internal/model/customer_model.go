@@ -9,7 +9,7 @@ type CustomerResponse struct {
 }
 
 type CustomerRegisterRequest struct {
-	EmailAddress string `json:"email_address,omitempty"`
+	EmailAddress string `json:"email_address,omitempty" validate:"email"`
 	PhoneNumber  string `json:"phone_number,omitempty"`
 	Name         string `json:"name,omitempty" validate:"required"`
 	Password     string `json:"password,omitempty" validate:"required"`
