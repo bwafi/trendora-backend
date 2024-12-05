@@ -30,7 +30,10 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
 	if err != nil {
 		c.Log.Warnf("Failed to register user : %+v", err)
-		return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Errors: err.Error()})
+		return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
+			Code:    fiber.StatusBadRequest,
+			Message: err.Error(),
+		}})
 	}
 
 	return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Data: response})
