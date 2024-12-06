@@ -24,14 +24,23 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
+			Code:    fiber.StatusBadRequest,
+			Message: "Invalid request body",
+		}})
 	}
 
 	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
 	if err != nil {
 		c.Log.Warnf("Failed to register user : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
 		return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
-			Code:    fiber.StatusBadRequest,
+			Code:    statusCode,
 			Message: err.Error(),
 		}})
 	}
