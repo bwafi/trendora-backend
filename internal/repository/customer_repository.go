@@ -17,6 +17,24 @@ func NewCustomerRepository(log *logrus.Logger) *CustomersRepository {
 	}
 }
 
+func (c *CustomersRepository) Update(tx *gorm.DB, request *entity.Customers) error {
+	var customer entity.Customers
+
+	if err := tx.First(&customer, "id = ?", request.ID).Error; err != nil {
+		return err
+	}
+
+	customer.ID = request.ID
+	customer.Name = request.Name
+	customer.EmailAddress = request.EmailAddress
+	customer.PhoneNumber = request.PhoneNumber
+	customer.DateOfBirth = request.DateOfBirth
+	customer.Gender = request.Gender
+	customer.Password = request.Password
+
+	return tx.Save(&customer).Error
+}
+
 func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email string) (int64, error) {
 	var count int64
 	err := tx.Model(&entity.Customers{}).Where("email_address = ?", email).Count(&count).Error

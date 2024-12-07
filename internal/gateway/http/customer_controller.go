@@ -32,18 +32,51 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register user : %+v", err)
+		c.Log.Warnf("Failed to register customer : %+v", err)
 
 		statusCode := fiber.StatusInternalServerError
 		if fiberErr, ok := err.(*fiber.Error); ok {
 			statusCode = fiberErr.Code
 		}
 
-		return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
 			Code:    statusCode,
 			Message: err.Error(),
 		}})
 	}
 
-	return ctx.JSON(model.WebResponse[*model.CustomerResponse]{Data: response})
+	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{Data: response})
+}
+
+func (c *CustomerController) Update(ctx fiber.Ctx) error {
+	request := new(model.CustomerUpdateRequest)
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
+			Code:    fiber.StatusBadRequest,
+			Message: "Invalid request body",
+		}})
+	}
+
+	response, err := c.CustomerCase.Update(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to update customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
+		Data: response,
+	})
 }

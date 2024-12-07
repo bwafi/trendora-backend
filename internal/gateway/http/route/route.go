@@ -12,8 +12,13 @@ type RouteConfig struct {
 
 func (c *RouteConfig) Setup() {
 	c.SetupGuestRoute()
+	c.SetupAuthRoute()
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.Post("/api/users", c.CustomerController.Register)
+	c.App.Post("/api/customers", c.CustomerController.Register)
+}
+
+func (c *RouteConfig) SetupAuthRoute() {
+	c.App.Patch("/api/customers", c.CustomerController.Update)
 }

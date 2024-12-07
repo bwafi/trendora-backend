@@ -73,6 +73,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
+		c.Log.Warnf("Failed encrypt password : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
@@ -86,7 +87,54 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	}
 
 	if err := c.CustomersRepository.Create(tx, customer); err != nil {
-		c.Log.Warnf("Failed create user to database : %+v", err)
+		c.Log.Warnf("Failed create customer to database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CustomerToResposne(customer), nil
+}
+
+func (c CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpdateRequest) (*model.CustomerResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	var password string
+	if request.Password != "" {
+		hashPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.Log.Warnf("Failed encrypt password : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		password = string(hashPassword)
+	}
+
+	customer := &entity.Customers{
+		ID:           request.ID,
+		Name:         request.Name,
+		EmailAddress: request.EmailAddress,
+		PhoneNumber:  request.PhoneNumber,
+		Password:     string(password),
+		DateOfBirth:  request.DateOfBirth,
+		Gender:       request.Gender,
+	}
+
+	if err := c.CustomersRepository.Update(tx, customer); err != nil {
+		c.Log.Warnf("Failed update customer to database : %+v", err)
+
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
