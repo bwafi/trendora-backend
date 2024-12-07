@@ -24,10 +24,14 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
-			Code:    fiber.StatusBadRequest,
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
 			Message: "Invalid request body",
-		}})
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
 	}
 
 	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
@@ -39,13 +43,21 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 			statusCode = fiberErr.Code
 		}
 
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
-			Code:    statusCode,
-			Message: err.Error(),
-		}})
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Customer registration failed",
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{Data: response})
+	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
+		Status:  "Success",
+		Message: "Customer registration successful",
+		Data:    response,
+	})
 }
 
 func (c *CustomerController) Update(ctx fiber.Ctx) error {
@@ -53,10 +65,13 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{Errors: &model.ErrorResponse{
-			Code:    fiber.StatusBadRequest,
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
 			Message: "Invalid request body",
-		}})
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			}})
 	}
 
 	response, err := c.CustomerCase.Update(ctx.UserContext(), request)
@@ -69,6 +84,8 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 		}
 
 		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Customer update failed",
 			Errors: &model.ErrorResponse{
 				Code:    statusCode,
 				Message: err.Error(),
@@ -77,6 +94,8 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
-		Data: response,
+		Status:  "Success",
+		Message: "Update successful",
+		Data:    response,
 	})
 }
