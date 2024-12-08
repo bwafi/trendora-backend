@@ -14,7 +14,7 @@ import (
 func MustValidRegisterCustomer(level validator.StructLevel) {
 	registerRequest := level.Current().Interface().(model.CustomerRegisterRequest)
 
-	if registerRequest.PhoneNumber != "" || registerRequest.EmailAddress != "" {
+	if registerRequest.PhoneNumber != nil || registerRequest.EmailAddress != nil {
 		return
 	}
 

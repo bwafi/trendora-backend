@@ -21,7 +21,7 @@ func (c *CustomersRepository) Update(tx *gorm.DB, request *entity.Customers) err
 	return tx.Save(request).Error
 }
 
-func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email string) (int64, error) {
+func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email *string) (int64, error) {
 	var count int64
 	err := tx.Model(&entity.Customers{}).Where("email_address = ?", email).Count(&count).Error
 	if err != nil {
@@ -31,7 +31,7 @@ func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email string) (int64, e
 	return count, nil
 }
 
-func (c *CustomersRepository) ExistsByPhoneNumber(tx *gorm.DB, phoneNumber string) (int64, error) {
+func (c *CustomersRepository) ExistsByPhoneNumber(tx *gorm.DB, phoneNumber *string) (int64, error) {
 	var count int64
 	err := tx.Model(&entity.Customers{}).Where("phone_number = ?", phoneNumber).Count(&count).Error
 	if err != nil {

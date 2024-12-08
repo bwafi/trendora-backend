@@ -45,7 +45,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		return nil, fiber.NewError(fiber.StatusBadRequest, message)
 	}
 
-	if request.EmailAddress != "" {
+	if request.EmailAddress != nil {
 		exists, err := c.CustomersRepository.ExistsByEmail(tx, request.EmailAddress)
 		if err != nil {
 			c.Log.Warnf("Failed to check email existence : %+v", err)
@@ -58,7 +58,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		}
 	}
 
-	if request.PhoneNumber != "" {
+	if request.PhoneNumber != nil {
 		exists, err := c.CustomersRepository.ExistsByPhoneNumber(tx, request.PhoneNumber)
 		if err != nil {
 			c.Log.Warnf("Failed to check phone number existence : %+v", err)
