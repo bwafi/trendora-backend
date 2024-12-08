@@ -71,7 +71,8 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 			Errors: &model.ErrorResponse{
 				Code:    fiber.StatusBadRequest,
 				Message: "Invalid request body",
-			}})
+			},
+		})
 	}
 
 	response, err := c.CustomerCase.Update(ctx.UserContext(), request)

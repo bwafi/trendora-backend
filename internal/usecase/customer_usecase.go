@@ -96,7 +96,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	return converter.CustomerToResposne(customer), nil
+	return converter.CustomerToResponse(customer), nil
 }
 
 func (c CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpdateRequest) (*model.CustomerResponse, error) {
@@ -143,5 +143,5 @@ func (c CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpda
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	return converter.CustomerToResposne(customer), nil
+	return converter.CustomerToResponse(customer), nil
 }

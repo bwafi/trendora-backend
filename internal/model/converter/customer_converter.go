@@ -5,7 +5,7 @@ import (
 	"github.com/bwafi/trendora-backend/internal/model"
 )
 
-func CustomerToResposne(customer *entity.Customers) *model.CustomerResponse {
+func CustomerToResponse(customer *entity.Customers) *model.CustomerResponse {
 	return &model.CustomerResponse{
 		ID:        customer.ID,
 		Name:      customer.Name,
