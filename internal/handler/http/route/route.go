@@ -1,7 +1,7 @@
 package route
 
 import (
-	"github.com/bwafi/trendora-backend/internal/gateway/http"
+	"github.com/bwafi/trendora-backend/internal/handler/http"
 	"github.com/gofiber/fiber/v3"
 )
 

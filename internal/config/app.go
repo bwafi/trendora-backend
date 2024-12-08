@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/bwafi/trendora-backend/internal/gateway/http"
-	"github.com/bwafi/trendora-backend/internal/gateway/http/route"
+	"github.com/bwafi/trendora-backend/internal/handler/http"
+	"github.com/bwafi/trendora-backend/internal/handler/http/route"
 	"github.com/bwafi/trendora-backend/internal/repository"
 	"github.com/bwafi/trendora-backend/internal/usecase"
 	"github.com/go-playground/validator/v10"
