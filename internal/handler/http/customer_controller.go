@@ -96,7 +96,7 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
 		Status:  "Success",
-		Message: "Update successful",
+		Message: "Customer update successful",
 		Data:    response,
 	})
 }

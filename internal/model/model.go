@@ -1,8 +1,8 @@
 package model
 
 type WebResponse[T any] struct {
-	Status  string         `json:"data,omitempty"`
-	Message string         `json:"data,omitempty"`
+	Status  string         `json:"status,omitempty"`
+	Message string         `json:"message,omitempty"`
 	Data    T              `json:"data"`
 	Paging  *PageMetadata  `json:"paging,omitempty"`
 	Errors  *ErrorResponse `json:"errors,omitempty"`
