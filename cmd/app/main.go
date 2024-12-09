@@ -24,7 +24,6 @@ func main() {
 	})
 
 	webPort := viper.GetInt("web.port")
-	fmt.Println(webPort)
 	err := app.Listen(fmt.Sprintf(":%d", webPort), fiber.ListenConfig{EnablePrefork: viper.GetBool("web.prefork")})
 	if err != nil {
 		log.Fatalf("Failed to start server : %v", err)
