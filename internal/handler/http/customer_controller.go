@@ -100,3 +100,44 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 		Data:    response,
 	})
 }
+
+func (c *CustomerController) Delete(ctx fiber.Ctx) error {
+	request := new(model.CustomerDeleteRequest)
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Invalid request body",
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
+	}
+
+	response, err := c.CustomerCase.Delete(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to delete customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Customer update failed",
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
+		Status:  "Success",
+		Message: "Customer delete successful",
+		Data:    response,
+	})
+}

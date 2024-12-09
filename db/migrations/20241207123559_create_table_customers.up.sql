@@ -9,5 +9,5 @@ create table customers (
   password VARCHAR(255) NOT NULL,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
-  deleted_at BIGINT
+  deleted_at TIMESTAMP
 );

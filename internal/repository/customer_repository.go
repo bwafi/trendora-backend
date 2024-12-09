@@ -17,8 +17,8 @@ func NewCustomerRepository(log *logrus.Logger) *CustomersRepository {
 	}
 }
 
-func (c *CustomersRepository) Update(tx *gorm.DB, request *entity.Customers) error {
-	return tx.Save(request).Error
+func (c *CustomersRepository) FindById(tx *gorm.DB, customer *entity.Customers, id *string) error {
+	return tx.Where("id = ?", id).Take(customer).Error
 }
 
 func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email *string) (int64, error) {

@@ -99,7 +99,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	return converter.CustomerToResponse(customer), nil
 }
 
-func (c CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpdateRequest) (*model.CustomerResponse, error) {
+func (c *CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpdateRequest) (*model.CustomerResponse, error) {
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
@@ -135,6 +135,38 @@ func (c CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpda
 	if err := c.CustomersRepository.Update(tx, customer); err != nil {
 		c.Log.Warnf("Failed update customer to database : %+v", err)
 
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CustomerToResponse(customer), nil
+}
+
+func (c *CustomerUseCase) Delete(ctx context.Context, request *model.CustomerDeleteRequest) (*model.CustomerResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	customer := new(entity.Customers)
+	err := c.CustomersRepository.FindById(tx, customer, &request.ID)
+	if err != nil {
+		c.Log.Warnf("Failed to find customer : %+v", err)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Customer not found")
+	}
+
+	if err := c.CustomersRepository.Delete(tx, customer); err != nil {
+		c.Log.Warnf("Failed to delete customer : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
