@@ -9,6 +9,7 @@ func CustomerToResponse(customer *entity.Customers) *model.CustomerResponse {
 	return &model.CustomerResponse{
 		ID:        customer.ID,
 		Name:      customer.Name,
+		Token:     customer.Token,
 		CreatedAt: customer.CreatedAt,
 		UpdatedAt: customer.UpdatedAt,
 	}

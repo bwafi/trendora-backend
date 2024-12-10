@@ -11,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -20,14 +21,16 @@ type CustomerUseCase struct {
 	Log                 *logrus.Logger
 	Validate            *validator.Validate
 	CustomersRepository *repository.CustomersRepository
+	Config              *viper.Viper
 }
 
-func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, customersRepository *repository.CustomersRepository) *CustomerUseCase {
+func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *repository.CustomersRepository) *CustomerUseCase {
 	return &CustomerUseCase{
 		DB:                  db,
 		Log:                 log,
 		Validate:            validate,
 		CustomersRepository: customersRepository,
+		Config:              config,
 	}
 }
 
@@ -94,6 +97,57 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CustomerToResponse(customer), nil
+}
+
+func (c *CustomerUseCase) Login(ctx context.Context, request *model.CustomerLoginRequest) (*model.CustomerResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	customer := new(entity.Customers)
+	err := c.CustomersRepository.FindByEmailOrPhone(tx, customer, request.EmailAddress, request.PhoneNumber)
+	if err != nil {
+		c.Log.Warnf("Failed to query customer : %+v", err)
+
+		if request.EmailAddress != nil {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password")
+		}
+
+		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid phone or password")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(request.Password))
+	if err != nil {
+		c.Log.Warnf("Invalid password for customer ID %s : %+v", customer.ID, err)
+
+		if request.EmailAddress != nil {
+			return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid email or password")
+		}
+
+		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid phone or password")
+	}
+
+	// Generate Token
+	Token, errGenerate := pkg.GenerateRefreshToken(customer, c.Config)
+	if errGenerate != nil {
+		return nil, errGenerate
+	}
+
+	customer.Token = &Token
+	if err := c.CustomersRepository.Update(tx, customer); err != nil {
+		c.Log.Warnf("Failed to save token to database: %+v", err)
+
+		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
 	}
 
 	return converter.CustomerToResponse(customer), nil

@@ -21,6 +21,10 @@ func (c *CustomersRepository) FindById(tx *gorm.DB, customer *entity.Customers, 
 	return tx.Where("id = ?", id).Take(customer).Error
 }
 
+func (c *CustomersRepository) FindByEmailOrPhone(tx *gorm.DB, customer *entity.Customers, email *string, phone *string) error {
+	return tx.Where("email_address = ?", email).Or("phone_number = ?", phone).Take(customer).Error
+}
+
 func (c *CustomersRepository) ExistsByEmail(tx *gorm.DB, email *string) (int64, error) {
 	var count int64
 	err := tx.Model(&entity.Customers{}).Where("email_address = ?", email).Count(&count).Error

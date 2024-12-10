@@ -23,7 +23,7 @@ type BootstrapConfig struct {
 func Bootstrap(config *BootstrapConfig) {
 	customerRepository := repository.NewCustomerRepository(config.Log)
 
-	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, customerRepository)
+	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository)
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log)
 

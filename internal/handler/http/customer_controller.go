@@ -60,6 +60,47 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 	})
 }
 
+func (c *CustomerController) Login(ctx fiber.Ctx) error {
+	request := new(model.CustomerLoginRequest)
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Invalid request body",
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
+	}
+
+	response, err := c.CustomerCase.Login(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to register customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
+			Status:  "Failed",
+			Message: "Customer registration failed",
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
+		Status:  "Success",
+		Message: "Customer registration successful",
+		Data:    response,
+	})
+}
+
 func (c *CustomerController) Update(ctx fiber.Ctx) error {
 	request := new(model.CustomerUpdateRequest)
 

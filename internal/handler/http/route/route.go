@@ -16,10 +16,11 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.Post("/api/customers", c.CustomerController.Register)
+	c.App.Post("/api/customers/register", c.CustomerController.Register)
+	c.App.Post("/api/customers/login", c.CustomerController.Login)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-	c.App.Patch("/api/customers", c.CustomerController.Update)
-	c.App.Delete("/api/customers", c.CustomerController.Delete)
+	c.App.Patch("/api/auth/customers", c.CustomerController.Update)
+	c.App.Delete("/api/auth/customers", c.CustomerController.Delete)
 }
