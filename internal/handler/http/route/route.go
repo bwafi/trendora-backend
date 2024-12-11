@@ -21,6 +21,6 @@ func (c *RouteConfig) SetupGuestRoute() {
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-	c.App.Patch("/api/auth/customers", c.CustomerController.Update)
-	c.App.Delete("/api/auth/customers", c.CustomerController.Delete)
+	c.App.Patch("/api/customers", c.CustomerController.Update)
+	c.App.Delete("/api/customers", c.CustomerController.Delete)
 }
