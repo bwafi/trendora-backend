@@ -11,8 +11,9 @@ func NewViper() *viper.Viper {
 
 	config.SetConfigName("config")
 	config.SetConfigType("json")
+	config.AddConfigPath("./") // path working directory
 	config.AddConfigPath("./../")
-	config.AddConfigPath("./")
+	config.AddConfigPath("./../../") // path for test
 	err := config.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %w \n", err))
