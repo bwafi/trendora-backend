@@ -50,7 +50,7 @@ func CamelCaseToReadable(input string) string {
 
 	words := strings.Split(cases.Lower(language.Tag{}).String(output), " ")
 
-	if len(words) > 1 {
+	if len(words) > 0 {
 		words[0] = cases.Title(language.Tag{}).String(words[0])
 	}
 
