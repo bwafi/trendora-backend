@@ -57,7 +57,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 
 		if exists > 0 {
 			c.Log.Warnf("Email already in use : %+v", err)
-			return nil, fiber.NewError(fiber.StatusBadRequest, "Email already in use")
+			return nil, fiber.NewError(fiber.StatusConflict, "Email already in use")
 		}
 	}
 
@@ -70,7 +70,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 
 		if exists > 0 {
 			c.Log.Warnf("Phone number already in use : %+v", err)
-			return nil, fiber.NewError(fiber.StatusBadRequest, "Phone number already in use")
+			return nil, fiber.NewError(fiber.StatusConflict, "Phone number already in use")
 		}
 	}
 
