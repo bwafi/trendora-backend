@@ -25,7 +25,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository)
 
-	customerController := http.NewCustomerController(customerUseCase, config.Log)
+	customerController := http.NewCustomerController(customerUseCase, config.Log, config.Config)
 
 	routeConfig := route.RouteConfig{
 		App:                config.App,
