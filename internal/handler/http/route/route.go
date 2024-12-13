@@ -8,6 +8,7 @@ import (
 type RouteConfig struct {
 	App                *fiber.App
 	CustomerController *http.CustomerController
+	AuthMiddleware     fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -21,6 +22,8 @@ func (c *RouteConfig) SetupGuestRoute() {
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
+	c.App.Use(c.AuthMiddleware)
+
 	c.App.Patch("/api/customers", c.CustomerController.Update)
 	c.App.Delete("/api/customers", c.CustomerController.Delete)
 }

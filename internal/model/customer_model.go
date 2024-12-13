@@ -15,7 +15,7 @@ type CustomerResponse struct {
 type CustomerRegisterRequest struct {
 	EmailAddress *string `json:"email_address,omitempty" validate:"omitempty,email"`
 	PhoneNumber  *string `json:"phone_number,omitempty" validate:"omitempty,min=10,max=15"`
-	Name         string  `json:"name,omitempty" validate:"required,min=5,max=50"`
+	Name         string  `json:"name,omitempty" validate:"required,min=3,max=50"`
 	Password     string  `json:"password,omitempty" validate:"required,min=6"`
 	Gender       bool    `json:"gender,omitempty"`
 	DateOfBirth  int64   `json:"date_of_birth,omitempty"`
@@ -25,7 +25,7 @@ type CustomerUpdateRequest struct {
 	ID           string  `json:"id,omitempty" validate:"required"`
 	EmailAddress *string `json:"email_address,omitempty" validate:"omitempty,email"`
 	PhoneNumber  *string `json:"phone_number,omitempty" validate:"omitempty,min=10,max=15"`
-	Name         string  `json:"name,omitempty" validate:"required;min=5,max=50"`
+	Name         string  `json:"name,omitempty" validate:"required;min=3,max=50"`
 	Password     string  `json:"password,omitempty" validate:"required,min=6"`
 	Gender       bool    `json:"gender,omitempty"`
 	DateOfBirth  int64   `json:"date_of_birth,omitempty"`

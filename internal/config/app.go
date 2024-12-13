@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/bwafi/trendora-backend/internal/handler/http"
 	"github.com/bwafi/trendora-backend/internal/handler/http/route"
+	"github.com/bwafi/trendora-backend/internal/handler/middleware"
 	"github.com/bwafi/trendora-backend/internal/repository"
 	"github.com/bwafi/trendora-backend/internal/usecase"
 	"github.com/go-playground/validator/v10"
@@ -27,9 +28,12 @@ func Bootstrap(config *BootstrapConfig) {
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log, config.Config)
 
+	authMiddleware := middleware.AuthMiddleware(customerUseCase)
+
 	routeConfig := route.RouteConfig{
 		App:                config.App,
 		CustomerController: customerController,
+		AuthMiddleware:     authMiddleware,
 	}
 
 	routeConfig.Setup()
