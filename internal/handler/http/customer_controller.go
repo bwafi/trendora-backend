@@ -91,7 +91,7 @@ func (c *CustomerController) Login(ctx fiber.Ctx) error {
 
 		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
 			Status:  "Failed",
-			Message: "Customer registration failed",
+			Message: "Customer login failed",
 			Errors: &model.ErrorResponse{
 				Code:    statusCode,
 				Message: err.Error(),
@@ -102,16 +102,16 @@ func (c *CustomerController) Login(ctx fiber.Ctx) error {
 	timeDuration := c.Config.GetInt("jwt.expRefreshToken")
 
 	ctx.Cookie(&fiber.Cookie{
-		Name:     "_SID_Trendora",
+		Name:     "_RT_Trendora",
 		Value:    *response.Token,
-		Expires:  time.Now().Add(time.Duration(timeDuration)),
+		Expires:  time.Now().Add(time.Duration(timeDuration) * time.Minute),
 		HTTPOnly: true,
 		Secure:   true,
 	})
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
 		Status:  "Success",
-		Message: "Customer registration successful",
+		Message: "Customer login successful",
 		Data:    response,
 	})
 }
