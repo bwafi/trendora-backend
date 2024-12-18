@@ -23,7 +23,7 @@ type CustomerAddressUsecase struct {
 	CustomerAddressRepository *repository.CustomersAddressRepository
 }
 
-func NewCustomerAddressUsecase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *repository.CustomerRepository) *CustomerAddressUsecase {
+func NewCustomerAddressUsecase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersAddressRepository *repository.CustomersAddressRepository) *CustomerAddressUsecase {
 	return &CustomerAddressUsecase{
 		DB:                        db,
 		Validate:                  validate,
