@@ -1,26 +1,21 @@
 package http
 
 import (
-	"time"
-
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/usecase"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 type CustomerController struct {
 	Log          *logrus.Logger
 	CustomerCase *usecase.CustomerUseCase
-	Config       *viper.Viper
 }
 
-func NewCustomerController(useCase *usecase.CustomerUseCase, logger *logrus.Logger, viper *viper.Viper) *CustomerController {
+func NewCustomerController(useCase *usecase.CustomerUseCase, logger *logrus.Logger) *CustomerController {
 	return &CustomerController{
 		Log:          logger,
 		CustomerCase: useCase,
-		Config:       viper,
 	}
 }
 
@@ -98,16 +93,6 @@ func (c *CustomerController) Login(ctx fiber.Ctx) error {
 			},
 		})
 	}
-
-	timeDuration := c.Config.GetInt("jwt.expRefreshToken")
-
-	ctx.Cookie(&fiber.Cookie{
-		Name:     "_RT_Trendora",
-		Value:    *response.Token,
-		Expires:  time.Now().Add(time.Duration(timeDuration) * time.Minute),
-		HTTPOnly: true,
-		Secure:   true,
-	})
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
 		Status:  "Success",

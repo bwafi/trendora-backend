@@ -7,7 +7,8 @@ type CustomerResponse struct {
 	Name         string  `json:"name,omitempty"`
 	Gender       bool    `json:"gender,omitempty"`
 	DateOfBirth  int64   `json:"date_of_birth,omitempty"`
-	Token        *string `json:"token,omitempty"`
+	RefreshToken string  `json:"refresh_token,omitempty"`
+	AccessToken  string  `json:"access_token,omitempty"`
 	CreatedAt    int64   `json:"created_at,omitempty"`
 	UpdatedAt    int64   `json:"updated_at,omitempty"`
 }

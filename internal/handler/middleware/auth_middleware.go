@@ -44,7 +44,7 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		token := tokenParts[1]
 		secretKey := customerCase.Config.GetString("accessToken")
 
-		jwtClaims, err := pkg.VerifyToken(token, customerCase.Config, customerCase.Log, secretKey)
+		jwtClaims, err := pkg.VerifyToken(token, customerCase.Log, secretKey)
 		if err != nil {
 			customerCase.Log.Warnf("Failed to verify token: %v", err)
 			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.CustomerResponse]{

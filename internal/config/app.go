@@ -23,10 +23,11 @@ type BootstrapConfig struct {
 
 func Bootstrap(config *BootstrapConfig) {
 	customerRepository := repository.NewCustomerRepository(config.Log)
+	customerSessionRepository := repository.NewCustomerSessionRepository(config.Log)
 
-	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository)
+	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository, customerSessionRepository)
 
-	customerController := http.NewCustomerController(customerUseCase, config.Log, config.Config)
+	customerController := http.NewCustomerController(customerUseCase, config.Log)
 
 	authMiddleware := middleware.AuthMiddleware(customerUseCase)
 

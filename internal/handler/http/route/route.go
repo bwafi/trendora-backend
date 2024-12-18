@@ -6,9 +6,10 @@ import (
 )
 
 type RouteConfig struct {
-	App                *fiber.App
-	CustomerController *http.CustomerController
-	AuthMiddleware     fiber.Handler
+	App                       *fiber.App
+	CustomerController        *http.CustomerController
+	CustomerAddressController *http.CustomerAddressController
+	AuthMiddleware            fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -26,4 +27,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	c.App.Patch("/api/customers", c.CustomerController.Update)
 	c.App.Delete("/api/customers", c.CustomerController.Delete)
+	c.App.Post("api/customers/address", c.CustomerAddressController.Create)
 }

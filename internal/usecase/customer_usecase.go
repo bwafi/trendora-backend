@@ -17,20 +17,22 @@ import (
 )
 
 type CustomerUseCase struct {
-	DB                  *gorm.DB
-	Log                 *logrus.Logger
-	Validate            *validator.Validate
-	CustomersRepository *repository.CustomersRepository
-	Config              *viper.Viper
+	DB                        *gorm.DB
+	Log                       *logrus.Logger
+	Validate                  *validator.Validate
+	CustomerRepository        *repository.CustomerRepository
+	CustomerSessionRepository *repository.CustomerSessionRepository
+	Config                    *viper.Viper
 }
 
-func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *repository.CustomersRepository) *CustomerUseCase {
+func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *repository.CustomerRepository, customerSessionRepository *repository.CustomerSessionRepository) *CustomerUseCase {
 	return &CustomerUseCase{
-		DB:                  db,
-		Log:                 log,
-		Validate:            validate,
-		CustomersRepository: customersRepository,
-		Config:              config,
+		DB:                        db,
+		Log:                       log,
+		Validate:                  validate,
+		CustomerRepository:        customersRepository,
+		CustomerSessionRepository: customerSessionRepository,
+		Config:                    config,
 	}
 }
 
@@ -49,7 +51,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	}
 
 	if request.EmailAddress != nil {
-		exists, err := c.CustomersRepository.ExistsByEmail(tx, request.EmailAddress)
+		exists, err := c.CustomerRepository.ExistsByEmail(tx, request.EmailAddress)
 		if err != nil {
 			c.Log.Warnf("Failed to check email existence : %+v", err)
 			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
@@ -62,7 +64,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 	}
 
 	if request.PhoneNumber != nil {
-		exists, err := c.CustomersRepository.ExistsByPhoneNumber(tx, request.PhoneNumber)
+		exists, err := c.CustomerRepository.ExistsByPhoneNumber(tx, request.PhoneNumber)
 		if err != nil {
 			c.Log.Warnf("Failed to check phone number existence : %+v", err)
 			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
@@ -89,7 +91,7 @@ func (c *CustomerUseCase) Create(ctx context.Context, request *model.CustomerReg
 		Gender:       request.Gender,
 	}
 
-	if err := c.CustomersRepository.Create(tx, customer); err != nil {
+	if err := c.CustomerRepository.Create(tx, customer); err != nil {
 		c.Log.Warnf("Failed create customer to database : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
@@ -115,7 +117,7 @@ func (c *CustomerUseCase) Login(ctx context.Context, request *model.CustomerLogi
 	}
 
 	customer := new(entity.Customers)
-	err := c.CustomersRepository.FindByEmailOrPhone(tx, customer, request.EmailAddress, request.PhoneNumber)
+	err := c.CustomerRepository.FindByEmailOrPhone(tx, customer, request.EmailAddress, request.PhoneNumber)
 	if err != nil {
 		c.Log.Warnf("Failed to query customer : %+v", err)
 
@@ -137,20 +139,40 @@ func (c *CustomerUseCase) Login(ctx context.Context, request *model.CustomerLogi
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid phone or password")
 	}
 
-	// Generate Token
-	Token, errGenerate := pkg.GenerateRefreshToken(customer, c.Config)
-	if errGenerate != nil {
-		return nil, errGenerate
+	// TODO: Add log for debuging
+	// Generate refresh Token
+	refreshToken, errRefreshToken := pkg.GenerateToken(customer, c.Config.GetString("jwt.refreshToken"), c.Config.GetInt("jwt.expRefreshToken"))
+	if errRefreshToken != nil {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, errRefreshToken.Error())
 	}
 
-	customer.Token = &Token
-	if err := c.CustomersRepository.Update(tx, customer); err != nil {
+	// TODO: Add log for debuging
+	// Generate access Token
+	accessToken, errAccessToken := pkg.GenerateToken(customer, c.Config.GetString("jwt.accessToken"), c.Config.GetInt("jwt.expAccessToken"))
+	if errAccessToken != nil {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, errAccessToken.Error())
+	}
+
+	// TODO: Add log for debuging
+	claims, errVerif := pkg.VerifyToken(refreshToken, c.Log, c.Config.GetString("jwt.refreshToken"))
+	if errVerif != nil {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, errVerif.Error())
+	}
+
+	customerSession := &entity.CustomerSessions{
+		CustomerID:   customer.ID,
+		RefreshToken: refreshToken,
+		ExpiresAt:    claims.ExpiresAt.Time,
+	}
+
+	// Store Refresh Token to Database
+	if err := c.CustomerSessionRepository.Create(tx, customerSession); err != nil {
 		c.Log.Warnf("Failed to save token to database: %+v", err)
 
-		return nil, fiber.NewError(fiber.StatusUnauthorized, "Unauthorized")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	return converter.CustomerToResponse(customer), nil
+	return converter.CustomerToAuthResponse(customer, accessToken, refreshToken), nil
 }
 
 func (c *CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpdateRequest) (*model.CustomerResponse, error) {
@@ -186,7 +208,7 @@ func (c *CustomerUseCase) Update(ctx context.Context, request *model.CustomerUpd
 		Gender:       request.Gender,
 	}
 
-	if err := c.CustomersRepository.Update(tx, customer); err != nil {
+	if err := c.CustomerRepository.Update(tx, customer); err != nil {
 		c.Log.Warnf("Failed update customer to database : %+v", err)
 
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
@@ -213,13 +235,13 @@ func (c *CustomerUseCase) Delete(ctx context.Context, request *model.CustomerDel
 	}
 
 	customer := new(entity.Customers)
-	err := c.CustomersRepository.FindById(tx, customer, &request.ID)
+	err := c.CustomerRepository.FindById(tx, customer, &request.ID)
 	if err != nil {
 		c.Log.Warnf("Failed to find customer : %+v", err)
 		return nil, fiber.NewError(fiber.StatusNotFound, "Customer not found")
 	}
 
-	if err := c.CustomersRepository.Delete(tx, customer); err != nil {
+	if err := c.CustomerRepository.Delete(tx, customer); err != nil {
 		c.Log.Warnf("Failed to delete customer : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}

@@ -18,6 +18,7 @@ type Customers struct {
 	UpdatedAt         int64               `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 	DeletedAt         gorm.DeletedAt      `gorm:"column:deleted_at;index"`
 	CustomerAddresses []CustomerAddresses `gorm:"foreignKey:customer_id;references:id"`
+	CustomerSession   []CustomerSessions  `gorm:"foreignKey:customer_id;references:id"`
 }
 
 func (c *Customers) TableName() string {
