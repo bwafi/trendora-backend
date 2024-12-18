@@ -139,24 +139,25 @@ func (c *CustomerUseCase) Login(ctx context.Context, request *model.CustomerLogi
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid phone or password")
 	}
 
-	// TODO: Add log for debuging
 	// Generate refresh Token
-	refreshToken, errRefreshToken := pkg.GenerateToken(customer, c.Config.GetString("jwt.refreshToken"), c.Config.GetInt("jwt.expRefreshToken"))
-	if errRefreshToken != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, errRefreshToken.Error())
+	refreshToken, err := pkg.GenerateToken(customer, c.Config.GetString("jwt.refreshToken"), c.Config.GetInt("jwt.expRefreshToken"))
+	if err != nil {
+		c.Log.Warnf("Failed generate refresh token: %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	// TODO: Add log for debuging
 	// Generate access Token
-	accessToken, errAccessToken := pkg.GenerateToken(customer, c.Config.GetString("jwt.accessToken"), c.Config.GetInt("jwt.expAccessToken"))
-	if errAccessToken != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, errAccessToken.Error())
+	accessToken, err := pkg.GenerateToken(customer, c.Config.GetString("jwt.accessToken"), c.Config.GetInt("jwt.expAccessToken"))
+	if err != nil {
+		c.Log.Warnf("Failed generate refresh token: %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	// TODO: Add log for debuging
-	claims, errVerif := pkg.VerifyToken(refreshToken, c.Log, c.Config.GetString("jwt.refreshToken"))
-	if errVerif != nil {
-		return nil, fiber.NewError(fiber.StatusUnauthorized, errVerif.Error())
+	// store token to database
+	claims, err := pkg.VerifyToken(refreshToken, c.Log, c.Config.GetString("jwt.refreshToken"))
+	if err != nil {
+		c.Log.Warnf("Failed generate refresh token: %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	customerSession := &entity.CustomerSessions{
