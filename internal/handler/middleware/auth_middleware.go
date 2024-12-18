@@ -42,7 +42,7 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		}
 
 		token := tokenParts[1]
-		secretKey := customerCase.Config.GetString("accessToken")
+		secretKey := customerCase.Config.GetString("jwt.accessToken")
 
 		jwtClaims, err := pkg.VerifyToken(token, customerCase.Log, secretKey)
 		if err != nil {
