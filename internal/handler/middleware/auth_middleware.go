@@ -51,7 +51,11 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 			})
 		}
 
-		ctx.Locals("auth", jwtClaims.ID)
+		auth := &model.Auth{
+			ID: jwtClaims.Subject,
+		}
+
+		ctx.Locals("auth", auth)
 		return ctx.Next()
 	}
 }
