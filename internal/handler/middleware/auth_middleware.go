@@ -16,8 +16,6 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		if stringToken == "" {
 			customerCase.Log.Warn("Missing authentication token")
 			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.CustomerResponse]{
-				Status:  "Unauthorized",
-				Message: "Missing authentication token",
 				Errors: &model.ErrorResponse{
 					Code:    fiber.StatusUnauthorized,
 					Message: "Missing authentication token",
@@ -32,8 +30,6 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		if len(tokenParts) != 2 && tokenParts[0] != "Bearer" {
 			customerCase.Log.Warn("Invalid authentication token")
 			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.CustomerResponse]{
-				Status:  "Unauthorized",
-				Message: "Invalid authentication token",
 				Errors: &model.ErrorResponse{
 					Code:    fiber.StatusUnauthorized,
 					Message: "Invalid authentication token",
@@ -48,8 +44,6 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		if err != nil {
 			customerCase.Log.Warnf("Failed to verify token: %v", err)
 			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.CustomerResponse]{
-				Status:  "Unauthorized",
-				Message: "Invalid or expired token",
 				Errors: &model.ErrorResponse{
 					Code:    fiber.StatusUnauthorized,
 					Message: "Invalid or expired token",
