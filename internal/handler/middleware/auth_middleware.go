@@ -55,3 +55,7 @@ func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
 		return ctx.Next()
 	}
 }
+
+func GetUser(ctx fiber.Ctx) *model.Auth {
+	return ctx.Locals("auth").(*model.Auth)
+}
