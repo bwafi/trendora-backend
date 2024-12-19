@@ -173,6 +173,11 @@ func (c *CustomerUseCase) Login(ctx context.Context, request *model.CustomerLogi
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
 	return converter.CustomerToAuthResponse(customer, accessToken, refreshToken), nil
 }
 
