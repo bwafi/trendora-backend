@@ -1,6 +1,9 @@
 package http
 
 import (
+	"fmt"
+
+	"github.com/bwafi/trendora-backend/internal/handler/middleware"
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/usecase"
 	"github.com/gofiber/fiber/v3"
@@ -53,6 +56,38 @@ func (c *CustomerAddressController) Create(ctx fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.AddressResponse]{
+		Data: response,
+	})
+}
+
+func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+	addressId := ctx.Params("addressId")
+	fmt.Println("customer id nih", auth)
+
+	request := &model.GetAddressRequest{
+		ID:         addressId,
+		CustomerID: auth.ID,
+	}
+
+	response, err := c.CustomerAddressCase.Get(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to register customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.AddressResponse]{
 		Data: response,
 	})
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type CustomersAddressRepository struct {
@@ -14,4 +15,8 @@ func NewCustomerAddressesRepository(log *logrus.Logger) *CustomersAddressReposit
 	return &CustomersAddressRepository{
 		Log: log,
 	}
+}
+
+func (c *CustomersAddressRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.CustomerAddresses, id string, customerId string) error {
+	return tx.Where("id = ? AND customer_id = ? ", id, customerId).Take(entity).Error
 }

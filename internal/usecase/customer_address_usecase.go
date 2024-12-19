@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
@@ -60,6 +61,35 @@ func (c *CustomerAddressUsecase) Create(ctx context.Context, request *model.Crea
 	if err := c.CustomerAddressRepository.Create(tx, customerAddress); err != nil {
 		c.Log.Warnf("Failed create customer to database : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CustomerAddressToResponse(customerAddress), nil
+}
+
+func (c *CustomerAddressUsecase) Get(ctx context.Context, request *model.GetAddressRequest) (*model.AddressResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	customerAddress := new(entity.CustomerAddresses)
+
+	fmt.Println("customer id nih", request.ID)
+
+	if err := c.CustomerAddressRepository.FindByIdAndCustomerId(tx, customerAddress, request.ID, request.CustomerID); err != nil {
+		c.Log.Warnf("Failed Find customer in database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Adddress not found")
 	}
 
 	if err := tx.Commit().Error; err != nil {
