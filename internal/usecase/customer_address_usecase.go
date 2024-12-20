@@ -99,3 +99,40 @@ func (c *CustomerAddressUsecase) Get(ctx context.Context, request *model.GetAddr
 
 	return converter.CustomerAddressToResponse(customerAddress), nil
 }
+
+func (c *CustomerAddressUsecase) Update(ctx context.Context, request *model.UpdateAddressRequest) (*model.AddressResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	customerAddress := &entity.CustomerAddresses{
+		ID:            request.ID,
+		CustomerID:    request.CustomerID,
+		RecipientName: request.RecipientName,
+		PhoneNumber:   request.PhoneNumber,
+		AddressType:   request.AddressType,
+		City:          request.City,
+		Province:      request.Province,
+		SubDistrict:   request.SubDistrict,
+		PostalCode:    request.PostalCode,
+		CourierNotes:  request.CourierNotes,
+	}
+	if err := c.CustomerAddressRepository.Update(tx, customerAddress); err != nil {
+		c.Log.Warnf("Failed update address in database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CustomerAddressToResponse(customerAddress), nil
+}

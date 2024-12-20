@@ -2,6 +2,7 @@ package model
 
 type AddressResponse struct {
 	ID            string `json:"id"`
+	CustomerID    string `json:"customer_id,omitempty"`
 	RecipientName string `json:"recipient_name,omitempty"`
 	PhoneNumber   string `json:"phone_number,omitempty"`
 	AddressType   string `json:"address_type,omitempty"`
@@ -15,10 +16,24 @@ type AddressResponse struct {
 }
 
 type CreateAddressRequest struct {
+	CustomerID    string `json:"customer_id,omitempty"`
+	RecipientName string `json:"recipient_name,omitempty"`
+	PhoneNumber   string `json:"phone_number,"`
+	AddressType   string `json:"address_type"`
+	City          string `json:"city"`
+	Province      string `json:"province"`
+	SubDistrict   string `json:"sub_district"`
+	PostalCode    string `json:"postal_code"`
+	CourierNotes  string `json:"courier_notes,omitempty"`
+	CreatedAt     int64  `json:"created_at,omitempty"`
+	UpdatedAt     int64  `json:"updated_at,omitempty"`
+}
+
+type UpdateAddressRequest struct {
 	ID            string `json:"id,omitempty"`
-	CustomerID    string `json:"customer_id"`
-	RecipientName string `json:"recipient_name"`
-	PhoneNumber   string `json:"phone_number"`
+	CustomerID    string `json:"customer_id,omitempty"`
+	RecipientName string `json:"recipient_name,omitempty"`
+	PhoneNumber   string `json:"phone_number,"`
 	AddressType   string `json:"address_type"`
 	City          string `json:"city"`
 	Province      string `json:"province"`

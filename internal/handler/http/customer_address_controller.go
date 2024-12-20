@@ -91,3 +91,43 @@ func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+	addressId := ctx.Params("addressId")
+	request := new(model.UpdateAddressRequest)
+
+	request.CustomerID = auth.ID
+	request.ID = addressId
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.AddressResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
+	}
+
+	response, err := c.CustomerAddressCase.Update(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to register customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.AddressResponse]{
+		Data: response,
+	})
+}

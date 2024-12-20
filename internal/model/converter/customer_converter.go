@@ -28,7 +28,8 @@ func CustomerToAuthResponse(customer *entity.Customers, accessToken string, refr
 func CustomerAddressToResponse(customer *entity.CustomerAddresses) *model.AddressResponse {
 	return &model.AddressResponse{
 		ID:            customer.ID,
-		RecipientName: customer.CustomerID,
+		CustomerID:    customer.CustomerID,
+		RecipientName: customer.RecipientName,
 		PhoneNumber:   customer.PhoneNumber,
 		AddressType:   customer.AddressType,
 		City:          customer.City,
