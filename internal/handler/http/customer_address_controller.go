@@ -72,7 +72,7 @@ func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.Get(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register customer : %+v", err)
+		c.Log.Warnf("Failed to get customer : %+v", err)
 
 		statusCode := fiber.StatusInternalServerError
 		if fiberErr, ok := err.(*fiber.Error); ok {
@@ -141,7 +141,7 @@ func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.Update(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register customer : %+v", err)
+		c.Log.Warnf("Failed to update customer : %+v", err)
 
 		statusCode := fiber.StatusInternalServerError
 		if fiberErr, ok := err.(*fiber.Error); ok {
