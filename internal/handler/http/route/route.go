@@ -31,4 +31,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	c.App.Get("api/customers/address/:addressId", c.CustomerAddressController.Get)
 	c.App.Patch("api/customers/address/:addressId", c.CustomerAddressController.Update)
+	c.App.Delete("api/customers/address/:addressId", c.CustomerAddressController.Delete)
 }

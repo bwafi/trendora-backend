@@ -44,6 +44,11 @@ type UpdateAddressRequest struct {
 	UpdatedAt     int64  `json:"updated_at,omitempty"`
 }
 
+type DeleteAddressRequest struct {
+	ID         string `json:"id,omitempty" validate:"required"`
+	CustomerID string `json:"customer_id,omitempty" validate:"red"`
+}
+
 type GetAddressRequest struct {
 	ID         string `json:"id,omitempty"`
 	CustomerID string `json:"customer_id"`

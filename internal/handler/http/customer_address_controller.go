@@ -131,3 +131,34 @@ func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *CustomerAddressController) Delete(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+	addressId := ctx.Params("addressId")
+
+	request := &model.DeleteAddressRequest{
+		ID:         addressId,
+		CustomerID: auth.ID,
+	}
+
+	err := c.CustomerAddressCase.Delete(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to delete address : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Address successfully deleted",
+	})
+}
