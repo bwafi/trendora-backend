@@ -92,6 +92,35 @@ func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 	})
 }
 
+func (c *CustomerAddressController) List(ctx fiber.Ctx) error {
+	auth := middleware.GetUser(ctx)
+
+	request := &model.GetAddressRequest{
+		CustomerID: auth.ID,
+	}
+
+	response, err := c.CustomerAddressCase.List(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to list customer : %+v", err)
+
+		statusCode := fiber.StatusInternalServerError
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			statusCode = fiberErr.Code
+		}
+
+		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    statusCode,
+				Message: err.Error(),
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[[]model.AddressResponse]{
+		Data: response,
+	})
+}
+
 func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 	addressId := ctx.Params("addressId")

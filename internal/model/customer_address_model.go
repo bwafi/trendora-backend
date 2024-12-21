@@ -46,10 +46,10 @@ type UpdateAddressRequest struct {
 
 type DeleteAddressRequest struct {
 	ID         string `json:"id,omitempty" validate:"required"`
-	CustomerID string `json:"customer_id,omitempty" validate:"red"`
+	CustomerID string `json:"customer_id,omitempty" validate:"required"`
 }
 
 type GetAddressRequest struct {
-	ID         string `json:"id,omitempty"`
-	CustomerID string `json:"customer_id"`
+	ID         string `json:"id,omitempty" validate:"omitempty,required"`
+	CustomerID string `json:"customer_id,omitempty" validate:"omitempty,required"`
 }

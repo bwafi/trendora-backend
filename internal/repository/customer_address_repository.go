@@ -20,3 +20,13 @@ func NewCustomerAddressesRepository(log *logrus.Logger) *CustomersAddressReposit
 func (c *CustomersAddressRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.CustomerAddresses, id string, customerId string) error {
 	return tx.Where("id = ? AND customer_id = ? ", id, customerId).Take(entity).Error
 }
+
+func (c *CustomersAddressRepository) FindAllByCustomerId(tx *gorm.DB, customerId string) ([]entity.CustomerAddresses, error) {
+	var addresses []entity.CustomerAddresses
+
+	if err := tx.Where("customer_id = ?", customerId).Find(&addresses).Error; err != nil {
+		return nil, err
+	}
+
+	return addresses, nil
+}

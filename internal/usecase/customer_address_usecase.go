@@ -100,6 +100,40 @@ func (c *CustomerAddressUsecase) Get(ctx context.Context, request *model.GetAddr
 	return converter.CustomerAddressToResponse(customerAddress), nil
 }
 
+func (c *CustomerAddressUsecase) List(ctx context.Context, request *model.GetAddressRequest) ([]model.AddressResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	addresses, err := c.CustomerAddressRepository.FindAllByCustomerId(tx, request.CustomerID)
+	if err != nil {
+		c.Log.Warnf("Failed Find customer in database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Adddress not found")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	// Preallocate responses slice with the same length as addresses
+	responses := make([]model.AddressResponse, len(addresses))
+
+	// Convert each address to response format
+	for i, address := range addresses {
+		responses[i] = *converter.CustomerAddressToResponse(&address)
+	}
+
+	return responses, nil
+}
+
 func (c *CustomerAddressUsecase) Update(ctx context.Context, request *model.UpdateAddressRequest) (*model.AddressResponse, error) {
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
