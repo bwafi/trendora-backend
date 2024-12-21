@@ -40,19 +40,7 @@ func (c *CustomerAddressController) Create(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.Create(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.AddressResponse]{
@@ -72,19 +60,7 @@ func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.Get(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to get customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.AddressResponse]{
@@ -101,19 +77,7 @@ func (c *CustomerAddressController) List(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.List(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to list customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[[]model.AddressResponse]{
@@ -141,19 +105,7 @@ func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerAddressCase.Update(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to update customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.AddressResponse]{
@@ -172,19 +124,7 @@ func (c *CustomerAddressController) Delete(ctx fiber.Ctx) error {
 
 	err := c.CustomerAddressCase.Delete(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to delete address : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.AddressResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{

@@ -16,14 +16,25 @@ func NewFiber(viper *viper.Viper) *fiber.App {
 
 func NewErrorHandler() fiber.ErrorHandler {
 	return func(ctx fiber.Ctx, err error) error {
+		// Default status code dan message
 		code := fiber.StatusInternalServerError
+		message := "Internal Server Error"
 
+		// Jika error merupakan instance dari fiber.Error
 		if e, ok := err.(*fiber.Error); ok {
 			code = e.Code
+			message = e.Message
+		} else {
+			// Cek error custom lainnya (opsional)
+			message = err.Error()
 		}
 
+		// Kembalikan response JSON dengan struktur yang diminta
 		return ctx.Status(code).JSON(fiber.Map{
-			"errors:": err.Error(),
+			"errors": fiber.Map{
+				"status":  code,
+				"message": message,
+			},
 		})
 	}
 }

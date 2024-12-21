@@ -1,9 +1,8 @@
 package model
 
 type WebResponse[T any] struct {
-	Data   T              `json:"data"`
-	Paging *PageMetadata  `json:"paging,omitempty"`
-	Errors *ErrorResponse `json:"errors,omitempty"`
+	Data   T             `json:"data"`
+	Paging *PageMetadata `json:"paging,omitempty"`
 }
 
 type PageResponse[T any] struct {
@@ -16,9 +15,4 @@ type PageMetadata struct {
 	Size      int   `json:"size"`
 	TotalItem int64 `json:"total_item"`
 	TotalPage int64 `json:"total_page"`
-}
-
-type ErrorResponse struct {
-	Code    int    `json:"code,omitempty"`
-	Message string `json:"message,omitempty"`
 }

@@ -34,19 +34,7 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
@@ -69,19 +57,7 @@ func (c *CustomerController) Login(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerCase.Login(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to register customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.CustomerResponse]{
@@ -104,19 +80,7 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerCase.Update(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to update customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
@@ -139,19 +103,7 @@ func (c *CustomerController) Delete(ctx fiber.Ctx) error {
 
 	response, err := c.CustomerCase.Delete(ctx.UserContext(), request)
 	if err != nil {
-		c.Log.Warnf("Failed to delete customer : %+v", err)
-
-		statusCode := fiber.StatusInternalServerError
-		if fiberErr, ok := err.(*fiber.Error); ok {
-			statusCode = fiberErr.Code
-		}
-
-		return ctx.Status(statusCode).JSON(model.WebResponse[*model.CustomerResponse]{
-			Errors: &model.ErrorResponse{
-				Code:    statusCode,
-				Message: err.Error(),
-			},
-		})
+		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CustomerResponse]{
