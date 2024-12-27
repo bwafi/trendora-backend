@@ -8,7 +8,7 @@ import (
 )
 
 type CustomerSessions struct {
-	ID           string    `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
+	ID           string    `gorm:"column:id;type:uuid;primaryKey"`
 	CustomerID   string    `gorm:"column:customer_id;not null" json:"customer_id"`
 	RefreshToken string    `gorm:"column:refresh_token;not null"`
 	IsRevoked    bool      `gorm:"column:is_revoked;default:false"`

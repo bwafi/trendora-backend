@@ -6,7 +6,7 @@ import (
 )
 
 type Customers struct {
-	ID                string              `gorm:"column:id;type:uuid;default:uuid_generate_v4()"`
+	ID                string              `gorm:"column:id;type:uuid;primaryKey"`
 	EmailAddress      *string             `gorm:"column:email_address;unique"`
 	PhoneNumber       *string             `gorm:"column:phone_number;type:varchar(20);unique"`
 	Name              string              `gorm:"column:name;type:varchar(50);not null"`
