@@ -1,4 +1,4 @@
-package usecase
+package customerusecase
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/model/converter"
-	"github.com/bwafi/trendora-backend/internal/repository"
+	customerrepo "github.com/bwafi/trendora-backend/internal/repository/customer"
 	"github.com/bwafi/trendora-backend/pkg"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -20,12 +20,12 @@ type CustomerUseCase struct {
 	DB                        *gorm.DB
 	Log                       *logrus.Logger
 	Validate                  *validator.Validate
-	CustomerRepository        *repository.CustomerRepository
-	CustomerSessionRepository *repository.CustomerSessionRepository
+	CustomerRepository        *customerrepo.CustomerRepository
+	CustomerSessionRepository *customerrepo.CustomerSessionRepository
 	Config                    *viper.Viper
 }
 
-func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *repository.CustomerRepository, customerSessionRepository *repository.CustomerSessionRepository) *CustomerUseCase {
+func NewCustomerUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersRepository *customerrepo.CustomerRepository, customerSessionRepository *customerrepo.CustomerSessionRepository) *CustomerUseCase {
 	return &CustomerUseCase{
 		DB:                        db,
 		Log:                       log,

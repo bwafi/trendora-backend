@@ -1,4 +1,4 @@
-package usecase
+package customerusecase
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/model/converter"
-	"github.com/bwafi/trendora-backend/internal/repository"
+	customerrepo "github.com/bwafi/trendora-backend/internal/repository/customer"
 	"github.com/bwafi/trendora-backend/pkg"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -21,16 +21,16 @@ type CustomerAddressUsecase struct {
 	Validate                  *validator.Validate
 	Config                    *viper.Viper
 	Log                       *logrus.Logger
-	CustomerAddressRepository *repository.CustomersAddressRepository
+	CustomerAddressRepository *customerrepo.CustomersAddressRepository
 }
 
-func NewCustomerAddressUsecase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersAddressRepository *repository.CustomersAddressRepository) *CustomerAddressUsecase {
+func NewCustomerAddressUsecase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, config *viper.Viper, customersAddressRepository *customerrepo.CustomersAddressRepository) *CustomerAddressUsecase {
 	return &CustomerAddressUsecase{
 		DB:                        db,
 		Validate:                  validate,
 		Config:                    config,
 		Log:                       log,
-		CustomerAddressRepository: &repository.CustomersAddressRepository{},
+		CustomerAddressRepository: &customerrepo.CustomersAddressRepository{},
 	}
 }
 

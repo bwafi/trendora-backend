@@ -5,7 +5,7 @@ import (
 
 	"github.com/bwafi/trendora-backend/internal/handler/middleware"
 	"github.com/bwafi/trendora-backend/internal/model"
-	"github.com/bwafi/trendora-backend/internal/usecase"
+	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -13,11 +13,11 @@ import (
 
 type CustomerAddressController struct {
 	Log                 *logrus.Logger
-	CustomerAddressCase *usecase.CustomerAddressUsecase
+	CustomerAddressCase *customerusecase.CustomerAddressUsecase
 	Config              *viper.Viper
 }
 
-func NewCustomerAddressController(useCase *usecase.CustomerAddressUsecase, logger *logrus.Logger, viper *viper.Viper) *CustomerAddressController {
+func NewCustomerAddressController(useCase *customerusecase.CustomerAddressUsecase, logger *logrus.Logger, viper *viper.Viper) *CustomerAddressController {
 	return &CustomerAddressController{
 		Log:                 logger,
 		CustomerAddressCase: useCase,

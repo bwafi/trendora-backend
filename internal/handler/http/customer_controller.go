@@ -2,17 +2,17 @@ package http
 
 import (
 	"github.com/bwafi/trendora-backend/internal/model"
-	"github.com/bwafi/trendora-backend/internal/usecase"
+	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 )
 
 type CustomerController struct {
 	Log          *logrus.Logger
-	CustomerCase *usecase.CustomerUseCase
+	CustomerCase *customerusecase.CustomerUseCase
 }
 
-func NewCustomerController(useCase *usecase.CustomerUseCase, logger *logrus.Logger) *CustomerController {
+func NewCustomerController(useCase *customerusecase.CustomerUseCase, logger *logrus.Logger) *CustomerController {
 	return &CustomerController{
 		Log:          logger,
 		CustomerCase: useCase,

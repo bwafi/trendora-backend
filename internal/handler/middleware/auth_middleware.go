@@ -4,12 +4,12 @@ import (
 	"strings"
 
 	"github.com/bwafi/trendora-backend/internal/model"
-	"github.com/bwafi/trendora-backend/internal/usecase"
+	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
 	"github.com/bwafi/trendora-backend/pkg"
 	"github.com/gofiber/fiber/v3"
 )
 
-func AuthMiddleware(customerCase *usecase.CustomerUseCase) fiber.Handler {
+func AuthMiddleware(customerCase *customerusecase.CustomerUseCase) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		stringToken := ctx.Get(fiber.HeaderAuthorization, "")
 

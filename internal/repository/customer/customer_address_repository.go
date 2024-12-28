@@ -1,13 +1,14 @@
-package repository
+package customerrepo
 
 import (
 	"github.com/bwafi/trendora-backend/internal/entity"
+	"github.com/bwafi/trendora-backend/internal/repository"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type CustomersAddressRepository struct {
-	Repository[entity.CustomerAddresses]
+	repository.Repository[entity.CustomerAddresses]
 	Log *logrus.Logger
 }
 

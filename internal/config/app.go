@@ -4,8 +4,8 @@ import (
 	"github.com/bwafi/trendora-backend/internal/handler/http"
 	"github.com/bwafi/trendora-backend/internal/handler/http/route"
 	"github.com/bwafi/trendora-backend/internal/handler/middleware"
-	"github.com/bwafi/trendora-backend/internal/repository"
-	"github.com/bwafi/trendora-backend/internal/usecase"
+	customerrepo "github.com/bwafi/trendora-backend/internal/repository/customer"
+	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
@@ -22,12 +22,12 @@ type BootstrapConfig struct {
 }
 
 func Bootstrap(config *BootstrapConfig) {
-	customerRepository := repository.NewCustomerRepository(config.Log)
-	customerSessionRepository := repository.NewCustomerSessionRepository(config.Log)
-	customerAddressRepository := repository.NewCustomerAddressesRepository(config.Log)
+	customerRepository := customerrepo.NewCustomerRepository(config.Log)
+	customerSessionRepository := customerrepo.NewCustomerSessionRepository(config.Log)
+	customerAddressRepository := customerrepo.NewCustomerAddressesRepository(config.Log)
 
-	customerUseCase := usecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository, customerSessionRepository)
-	customerAddressUsecase := usecase.NewCustomerAddressUsecase(config.DB, config.Log, config.Validate, config.Config, customerAddressRepository)
+	customerUseCase := customerusecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository, customerSessionRepository)
+	customerAddressUsecase := customerusecase.NewCustomerAddressUsecase(config.DB, config.Log, config.Validate, config.Config, customerAddressRepository)
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log)
 	cusomerAddressController := http.NewCustomerAddressController(customerAddressUsecase, config.Log, config.Config)
