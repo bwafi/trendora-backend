@@ -21,5 +21,11 @@
       "max": 100,
       "lifetime": 300
     }
+  },
+  "jwt": {
+    "refreshToken": "secretkey",
+    "accessToken": "secretkey",
+    "expRefreshToken": 43200,
+    "expAccessToken": 1440
   }
 }
