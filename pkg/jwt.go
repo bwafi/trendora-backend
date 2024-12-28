@@ -47,7 +47,7 @@ func VerifyToken(tokenString string, log *logrus.Logger, secretKey string) (*mod
 
 	claims, ok := token.Claims.(*model.JwtCustomClaims)
 	if !ok && !token.Valid {
-		return nil, fmt.Errorf("Invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	return claims, nil

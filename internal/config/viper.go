@@ -7,7 +7,7 @@ import (
 )
 
 func NewViper() *viper.Viper {
-	var config *viper.Viper = viper.New()
+	config := viper.New()
 
 	config.SetConfigName("config")
 	config.SetConfigType("json")
@@ -16,7 +16,7 @@ func NewViper() *viper.Viper {
 	config.AddConfigPath("./../../") // path for subfolder test
 	err := config.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 
 	return config
