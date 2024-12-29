@@ -10,6 +10,13 @@ type Category struct {
 	ParentId string `gorm:"column:parent_id"`
 	Name     string `gorm:"column:name;type:varchar(100);not null"`
 	Slug     string `gorm:"column:slug;type:varchar(100);not null"`
+
+	// Self-referential relationship
+	ParentCategory     *Category  `gorm:"foreignKey:parent_id;references:id"`
+	ChildrenCategories []Category `gorm:"foreignKey:parent_id;references:id"`
+
+	Product    []Product `gorm:"foreignKey:category_id;references:id"`
+	SubProduct []Product `gorm:"foreignKey:sub_category_id;references:id"`
 }
 
 func (c *Category) TableName() string {

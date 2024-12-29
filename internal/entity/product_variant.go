@@ -16,6 +16,9 @@ type ProductVariant struct {
 	StockQuantity int     `gorm:"column:stock_quantity;type:int;not null"`
 	Weight        float32 `gorm:"column:weight;type:decimal(8,2)"`
 	IsAvailable   bool    `gorm:"column:is_available;type:bool"`
+
+	ProductImage []ProductImage `gorm:"foreignKey:variant_id;references:id"`
+	Product      Product        `gorm:"foreignKey:product_id;references:id"`
 }
 
 func (c *ProductVariant) TableName() string {
