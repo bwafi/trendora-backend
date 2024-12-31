@@ -37,14 +37,16 @@ func Bootstrap(config *BootstrapConfig) {
 	cusomerAddressController := http.NewCustomerAddressController(customerAddressUsecase, config.Log, config.Config)
 	adminController := http.NewAdminUseCase(adminUseCase, config.Log)
 
-	authMiddleware := middleware.AuthMiddleware(customerUseCase)
+	customerAuthMiddleware := middleware.CustomerAuthMiddleware(customerUseCase)
+	adminAuthMiddleware := middleware.AdminAuthMiddleware(adminUseCase)
 
 	routeConfig := route.RouteConfig{
 		App:                       config.App,
 		CustomerController:        customerController,
 		CustomerAddressController: cusomerAddressController,
 		AdminController:           adminController,
-		AuthMiddleware:            authMiddleware,
+		CustomerAuthMiddleware:    customerAuthMiddleware,
+		AdminAuthMiddleware:       adminAuthMiddleware,
 	}
 
 	routeConfig.Setup()

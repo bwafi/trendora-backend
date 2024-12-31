@@ -116,14 +116,14 @@ func (c *AdminUseCase) Login(ctx context.Context, request *model.AdminLoginReque
 	}
 
 	// Generate refresh Token
-	refreshToken, err := pkg.GenerateTokenAdmin(admin, c.Config.GetString("jwt.refreshToken"), c.Config.GetInt("jwt.expRefreshToken"))
+	refreshToken, err := pkg.GenerateToken(admin.Name, admin.ID, "admin", c.Config.GetString("jwt.refreshToken"), c.Config.GetInt("jwt.expRefreshToken"))
 	if err != nil {
 		c.Log.Warnf("Failed generate refresh token: %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	// Generate access Token
-	accessToken, err := pkg.GenerateTokenAdmin(admin, c.Config.GetString("jwt.accessToken"), c.Config.GetInt("jwt.expAccessToken"))
+	accessToken, err := pkg.GenerateToken(admin.Name, admin.ID, "admin", c.Config.GetString("jwt.accessToken"), c.Config.GetInt("jwt.expAccessToken"))
 	if err != nil {
 		c.Log.Warnf("Failed generate refresh token: %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")

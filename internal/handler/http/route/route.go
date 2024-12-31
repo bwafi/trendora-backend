@@ -10,7 +10,8 @@ type RouteConfig struct {
 	CustomerController        *http.CustomerController
 	CustomerAddressController *http.CustomerAddressController
 	AdminController           *http.AdminController
-	AuthMiddleware            fiber.Handler
+	CustomerAuthMiddleware    fiber.Handler
+	AdminAuthMiddleware       fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -19,22 +20,24 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.Post("/api/customers/register", c.CustomerController.Register)
-	c.App.Post("/api/customers/login", c.CustomerController.Login)
+	customerRoutes := c.App.Group("/api/customers")
+	customerRoutes.Post("/register", c.CustomerController.Register)
+	customerRoutes.Post("/login", c.CustomerController.Login)
 
-	c.App.Post("api/admins/register", c.AdminController.Register)
-	c.App.Post("api/admins/login", c.AdminController.Login)
+	adminRoutes := c.App.Group("/api/admins")
+	adminRoutes.Post("/register", c.AdminController.Register)
+	adminRoutes.Post("/login", c.AdminController.Login)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
-	c.App.Use(c.AuthMiddleware)
+	customerAuthRoutes := c.App.Group("/api/customers", c.CustomerAuthMiddleware)
+	customerAuthRoutes.Patch("/", c.CustomerController.Update)
+	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
 
-	c.App.Patch("/api/customers", c.CustomerController.Update)
-	c.App.Delete("/api/customers", c.CustomerController.Delete)
-	c.App.Post("api/customers/address", c.CustomerAddressController.Create)
-
-	c.App.Get("api/customers/address/:addressId", c.CustomerAddressController.Get)
-	c.App.Patch("api/customers/address/:addressId", c.CustomerAddressController.Update)
-	c.App.Delete("api/customers/address/:addressId", c.CustomerAddressController.Delete)
-	c.App.Get("api/customers/address/", c.CustomerAddressController.List)
+	addressRoutes := customerAuthRoutes.Group("/address")
+	addressRoutes.Post("/", c.CustomerAddressController.Create)
+	addressRoutes.Get("/", c.CustomerAddressController.List)
+	addressRoutes.Get("/:addressId", c.CustomerAddressController.Get)
+	addressRoutes.Patch("/:addressId", c.CustomerAddressController.Update)
+	addressRoutes.Delete("/:addressId", c.CustomerAddressController.Delete)
 }

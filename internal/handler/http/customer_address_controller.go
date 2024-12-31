@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	"github.com/bwafi/trendora-backend/internal/handler/middleware"
 	"github.com/bwafi/trendora-backend/internal/model"
 	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
@@ -27,6 +25,9 @@ func NewCustomerAddressController(useCase *customerusecase.CustomerAddressUsecas
 
 func (c *CustomerAddressController) Create(ctx fiber.Ctx) error {
 	request := new(model.CreateAddressRequest)
+	auth := middleware.GetUser(ctx)
+
+	request.CustomerID = auth.ID
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
@@ -51,7 +52,6 @@ func (c *CustomerAddressController) Create(ctx fiber.Ctx) error {
 func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 	auth := middleware.GetUser(ctx)
 	addressId := ctx.Params("addressId")
-	fmt.Println("customer id nih", auth)
 
 	request := &model.GetAddressRequest{
 		ID:         addressId,
