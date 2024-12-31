@@ -9,6 +9,7 @@ type RouteConfig struct {
 	App                       *fiber.App
 	CustomerController        *http.CustomerController
 	CustomerAddressController *http.CustomerAddressController
+	AdminController           *http.AdminController
 	AuthMiddleware            fiber.Handler
 }
 
@@ -20,6 +21,8 @@ func (c *RouteConfig) Setup() {
 func (c *RouteConfig) SetupGuestRoute() {
 	c.App.Post("/api/customers/register", c.CustomerController.Register)
 	c.App.Post("/api/customers/login", c.CustomerController.Login)
+
+	c.App.Post("api/admins", c.AdminController.Register)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
