@@ -24,7 +24,7 @@ func (c *AdminController) Register(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.AdminResponse]{
 			Errors: &model.ErrorResponse{
 				Code:    fiber.StatusBadRequest,
 				Message: "Invalid request body",
@@ -38,6 +38,29 @@ func (c *AdminController) Register(ctx fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.AdminResponse]{
+		Data: response,
+	})
+}
+
+func (c *AdminController) Login(ctx fiber.Ctx) error {
+	request := new(model.AdminLoginRequest)
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.AdminResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
+	}
+
+	response, err := c.AdminUseCase.Login(ctx.UserContext(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.AdminResponse]{
 		Data: response,
 	})
 }

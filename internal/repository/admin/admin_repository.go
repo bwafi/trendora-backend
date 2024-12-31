@@ -18,6 +18,10 @@ func NewAdminrRepository(log *logrus.Logger) *AdminRepository {
 	}
 }
 
+func (c *AdminRepository) FindByEmail(tx *gorm.DB, admin *entity.Admin, email string) error {
+	return tx.Where("email = ?", email).Take(admin).Error
+}
+
 func (c *AdminRepository) ExistsByEmail(tx *gorm.DB, email *string) (int64, error) {
 	var count int64
 	err := tx.Model(&entity.Admin{}).Where("email = ?", email).Count(&count).Error
