@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/gofiber/fiber/v3"
 	"github.com/spf13/viper"
 )
@@ -16,24 +17,20 @@ func NewFiber(viper *viper.Viper) *fiber.App {
 
 func NewErrorHandler() fiber.ErrorHandler {
 	return func(ctx fiber.Ctx, err error) error {
-		// Default status code dan message
 		code := fiber.StatusInternalServerError
 		message := "Internal Server Error"
 
-		// Jika error merupakan instance dari fiber.Error
 		if e, ok := err.(*fiber.Error); ok {
 			code = e.Code
 			message = e.Message
 		} else {
-			// Cek error custom lainnya (opsional)
 			message = err.Error()
 		}
 
-		// Kembalikan response JSON dengan struktur yang diminta
-		return ctx.Status(code).JSON(fiber.Map{
-			"errors": fiber.Map{
-				"status":  code,
-				"message": message,
+		return ctx.Status(code).JSON(model.WebResponse[*string]{
+			Errors: &model.ErrorResponse{
+				Code:    code,
+				Message: message,
 			},
 		})
 	}
