@@ -13,3 +13,14 @@ func AdminToAdminResponse(admin *entity.Admin) *model.AdminResponse {
 		UpdatedAt: admin.UpdatedAt,
 	}
 }
+
+func AdminToAuthResponse(admin *entity.Admin, accessToken string, refreshToken string) *model.AdminResponse {
+	return &model.AdminResponse{
+		ID:           admin.ID,
+		Name:         admin.Name,
+		RefreshToken: refreshToken,
+		AccessToken:  accessToken,
+		CreatedAt:    admin.CreatedAt,
+		UpdatedAt:    admin.UpdatedAt,
+	}
+}
