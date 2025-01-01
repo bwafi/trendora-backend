@@ -19,3 +19,7 @@ func (c *Repository[T]) Update(tx *gorm.DB, entity *T) error {
 func (c *Repository[T]) Delete(tx *gorm.DB, entity *T) error {
 	return tx.Delete(entity).Error
 }
+
+func (c *Repository[T]) FindById(tx *gorm.DB, entity *T, id any) error {
+	return tx.Where("id = ?", id).Take(entity).Error
+}
