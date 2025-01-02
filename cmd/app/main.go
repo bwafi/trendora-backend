@@ -14,13 +14,15 @@ func main() {
 	logger := config.NewLogger(viper)
 	db := config.NewDatabase(viper, logger)
 	validate := config.NewValidation()
+	cloudinary := config.NewCloudinary(viper)
 
 	config.Bootstrap(&config.BootstrapConfig{
-		DB:       db,
-		App:      app,
-		Log:      logger,
-		Validate: validate,
-		Config:   viper,
+		DB:         db,
+		App:        app,
+		Log:        logger,
+		Validate:   validate,
+		Config:     viper,
+		Cloudinary: cloudinary,
 	})
 
 	webPort := viper.GetInt("web.port")

@@ -27,5 +27,8 @@
     "accessToken": "secretkey",
     "expRefreshToken": 43200,
     "expAccessToken": 1440
+  },
+  "cloudinary": {
+    "url": "cloudinary://API_KEY_PLACEHOLDER:API_SECRET_PLACEHOLDER@CLOUD_NAME_PLACEHOLDER"
   }
 }

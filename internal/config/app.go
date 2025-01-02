@@ -8,6 +8,7 @@ import (
 	customerrepo "github.com/bwafi/trendora-backend/internal/repository/customer"
 	adminusecase "github.com/bwafi/trendora-backend/internal/usecase/admin"
 	customerusecase "github.com/bwafi/trendora-backend/internal/usecase/customer"
+	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
@@ -16,11 +17,12 @@ import (
 )
 
 type BootstrapConfig struct {
-	DB       *gorm.DB
-	App      *fiber.App
-	Log      *logrus.Logger
-	Validate *validator.Validate
-	Config   *viper.Viper
+	DB         *gorm.DB
+	App        *fiber.App
+	Log        *logrus.Logger
+	Validate   *validator.Validate
+	Config     *viper.Viper
+	Cloudinary *cloudinary.Cloudinary
 }
 
 func Bootstrap(config *BootstrapConfig) {
