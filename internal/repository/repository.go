@@ -12,6 +12,10 @@ func (c *Repository[T]) Create(tx *gorm.DB, entity *T) error {
 	return tx.Create(entity).Error
 }
 
+func (c *Repository[T]) BulkCreate(tx *gorm.DB, entities []*T) error {
+	return tx.Create(entities).Error
+}
+
 func (c *Repository[T]) Update(tx *gorm.DB, entity *T) error {
 	return tx.Save(entity).Error
 }

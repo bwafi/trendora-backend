@@ -17,12 +17,12 @@ type ProductVariant struct {
 	Weight        float32 `gorm:"column:weight;type:decimal(8,2)"`
 	IsAvailable   bool    `gorm:"column:is_available;type:bool"`
 
-	ProductImage []ProductImage `gorm:"foreignKey:variant_id;references:id"`
+	VariantImage []VariantImage `gorm:"foreignKey:variant_id;references:id"`
 	Product      Product        `gorm:"foreignKey:product_id;references:id"`
 }
 
 func (c *ProductVariant) TableName() string {
-	return "proucts"
+	return "prouct_variants"
 }
 
 func (c *ProductVariant) BeforeCreate(tx *gorm.DB) (err error) {
