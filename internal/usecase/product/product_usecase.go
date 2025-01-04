@@ -1,8 +1,16 @@
 package productusecase
 
 import (
+	"context"
+
+	"github.com/bwafi/trendora-backend/internal/entity"
+	"github.com/bwafi/trendora-backend/internal/model"
+	"github.com/bwafi/trendora-backend/internal/model/converter"
 	productrepo "github.com/bwafi/trendora-backend/internal/repository/product"
+	"github.com/bwafi/trendora-backend/pkg"
+	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v3"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -11,68 +19,130 @@ type ProductUseCase struct {
 	DB                       *gorm.DB
 	Log                      *logrus.Logger
 	Validate                 *validator.Validate
+	Cloudinary               *cloudinary.Cloudinary
 	ProductRepository        *productrepo.ProductRepository
 	CategoryRepository       *productrepo.CategoryRepository
 	ProductImageRepository   *productrepo.ProductImageRepository
+	VariantImageRepository   *productrepo.VariantImageRepository
 	ProductVariantRepository *productrepo.ProductVariantRepository
 }
 
-func NewProductUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, productRepo *productrepo.ProductRepository) *ProductUseCase {
+func NewProductUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, cloudinary *cloudinary.Cloudinary, productRepo *productrepo.ProductRepository, categoryRepository *productrepo.CategoryRepository, productImageRepo *productrepo.ProductImageRepository, variantImageRepo *productrepo.VariantImageRepository, productVariantRepo *productrepo.ProductVariantRepository) *ProductUseCase {
 	return &ProductUseCase{
-		DB:                db,
-		Log:               log,
-		Validate:          validate,
-		ProductRepository: productRepo,
+		DB:                       db,
+		Log:                      log,
+		Validate:                 validate,
+		Cloudinary:               cloudinary,
+		ProductRepository:        productRepo,
+		CategoryRepository:       categoryRepository,
+		ProductImageRepository:   productImageRepo,
+		VariantImageRepository:   variantImageRepo,
+		ProductVariantRepository: productVariantRepo,
 	}
 }
 
-// func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProductRequest) (*model.ProductResponse, error) {
-// 	tx := c.DB.WithContext(ctx).Begin()
-// 	defer tx.Rollback()
-//
-// 	if err := c.Validate.Struct(request); err != nil {
-// 		c.Log.Warnf("Invalid request body : %+v", err)
-//
-// 		message := pkg.ParseValidationErrors(err)
-// 		return nil, fiber.NewError(fiber.StatusBadRequest, message)
-// 	}
-//
-// 	category := new(entity.Category)
-// 	if err := c.CategoryRepository.FindById(tx, category, request.CategoryId); err != nil {
-// 		c.Log.Warnf("Category not found: %v", err)
-// 		return nil, fiber.NewError(fiber.StatusNotFound, "Category not found")
-// 	}
-//
-// 	subCategory := new(entity.Category)
-// 	if err := c.CategoryRepository.FindById(tx, subCategory, request.CategoryId); err != nil {
-// 		c.Log.Warnf("Sub category not found: %v", err)
-// 		return nil, fiber.NewError(fiber.StatusNotFound, "Sub category not found")
-// 	}
-// 	product := &entity.Product{
-// 		StyleCode:      request.StyleCode,
-// 		Name:           request.Name,
-// 		Description:    request.Description,
-// 		Gender:         request.Gender,
-// 		CategoryId:     request.CategoryId,
-// 		SubCategoryId:  request.SubCategoryId,
-// 		BasePrice:      request.BasePrice,
-// 		IsVisible:      request.IsVisible,
-// 		ReleaseDate:    request.ReleaseDate,
-// 		ProductImage:   []entity.ProductImage{},
-// 		ProductVariant: []entity.ProductVariant{},
-// 	}
-//
-// 	if err := c.ProductRepository.Create(tx, product); err != nil {
-// 		c.Log.Warnf("Failed create product  to database : %+v", err)
-// 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
-// 	}
-//
-// 	var productVariants []*entity.ProductVariant
-// 	for i := range request.ProductVariant {
-// 		productVariants = append(productVariants)
-// 	}
-//
-// 	c.ProductVariantRepository.BulkCreate(tx, productVariants)
-//
-// 	return nil, nil
-// }
+func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProductRequest) (*model.ProductResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	category := new(entity.Category)
+	if err := c.CategoryRepository.FindById(tx, category, request.CategoryId); err != nil {
+		c.Log.Warnf("Category not found: %v", err)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Category not found")
+	}
+
+	subCategory := new(entity.Category)
+	if err := c.CategoryRepository.FindById(tx, subCategory, request.SubCategoryId); err != nil {
+		c.Log.Warnf("Sub category not found: %v", err)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Sub category not found")
+	}
+	product := &entity.Product{
+		StyleCode:     request.StyleCode,
+		Name:          request.Name,
+		Description:   request.Description,
+		Gender:        request.Gender,
+		CategoryId:    request.CategoryId,
+		SubCategoryId: request.SubCategoryId,
+		BasePrice:     request.BasePrice,
+		IsVisible:     request.IsVisible,
+		ReleaseDate:   request.ReleaseDate,
+	}
+
+	if err := c.ProductRepository.Create(tx, product); err != nil {
+		c.Log.Warnf("Failed create product  to database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	var productImages []*entity.ProductImage
+	for _, image := range request.ProductImages {
+
+		imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image)
+
+		productImage := &entity.ProductImage{
+			ProductId:    product.ID,
+			ImageUrl:     imageUrl,
+			DisplayOrder: image.DisplayOrder,
+		}
+
+		productImages = append(productImages, productImage)
+
+	}
+
+	if err := c.ProductImageRepository.BulkCreate(tx, productImages); err != nil {
+		c.Log.Warnf("Failed create images  to database : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	var productVariants []*entity.ProductVariant
+	var variantImages []*entity.VariantImage
+	for _, variant := range request.ProductVariants {
+		productVariant := &entity.ProductVariant{
+			ProductId:     product.ID,
+			SKU:           variant.SKU,
+			ColorName:     variant.ColorName,
+			Size:          variant.Size,
+			Discount:      variant.Discount,
+			Price:         variant.Price,
+			StockQuantity: variant.StockQuantity,
+			Weight:        variant.Weight,
+			IsAvailable:   variant.IsAvailable,
+		}
+
+		if err := c.ProductVariantRepository.Create(tx, productVariant); err != nil {
+			c.Log.Warnf("Failed create variant  to database : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		for _, image := range variant.VariantImages {
+			imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image)
+			variantImage := &entity.VariantImage{
+				VarianId:     productVariant.ID,
+				ImageUrl:     imageUrl,
+				DisplayOrder: image.DisplayOrder,
+			}
+
+			variantImages = append(variantImages, variantImage)
+		}
+
+		if err := c.VariantImageRepository.BulkCreate(tx, variantImages); err != nil {
+			c.Log.Warnf("Failed create images variant  to database : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		productVariants = append(productVariants, productVariant)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.ProductToResponse(product, productVariants, productImages, variantImages), nil
+}

@@ -9,6 +9,7 @@ type RouteConfig struct {
 	App                       *fiber.App
 	CustomerController        *http.CustomerController
 	CustomerAddressController *http.CustomerAddressController
+	ProductController         *http.ProductController
 	AdminController           *http.AdminController
 	CustomerAuthMiddleware    fiber.Handler
 	AdminAuthMiddleware       fiber.Handler
@@ -17,6 +18,7 @@ type RouteConfig struct {
 func (c *RouteConfig) Setup() {
 	c.SetupGuestRoute()
 	c.SetupAuthRoute()
+	c.SetupAdminRoute()
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
@@ -27,6 +29,11 @@ func (c *RouteConfig) SetupGuestRoute() {
 	adminRoutes := c.App.Group("/api/admins")
 	adminRoutes.Post("/register", c.AdminController.Register)
 	adminRoutes.Post("/login", c.AdminController.Login)
+
+	// Public Product Routes (Accessible to both Admin and Customer)
+	// productRoutes := c.App.Group("/api/products")
+	// productRoutes.Get("/", c.ProductController.List)          // List Products (Shared Route)
+	// productRoutes.Get("/:productId", c.ProductController.Get) // View a specific Product (Shared Route)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
@@ -40,4 +47,13 @@ func (c *RouteConfig) SetupAuthRoute() {
 	addressRoutes.Get("/:addressId", c.CustomerAddressController.Get)
 	addressRoutes.Patch("/:addressId", c.CustomerAddressController.Update)
 	addressRoutes.Delete("/:addressId", c.CustomerAddressController.Delete)
+}
+
+func (c *RouteConfig) SetupAdminRoute() {
+	// Admin-only Routes
+	adminRoutes := c.App.Group("/api/admins", c.AdminAuthMiddleware)
+
+	// Admin product routes (for creating and managing products)
+	adminProductRoutes := adminRoutes.Group("/products")
+	adminProductRoutes.Post("/", c.ProductController.Create) // Create Product (Admin-only)
 }
