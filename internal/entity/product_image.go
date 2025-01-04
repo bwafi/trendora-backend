@@ -15,7 +15,7 @@ type ProductImage struct {
 }
 
 func (c *ProductImage) TableName() string {
-	return "prouct_images"
+	return "product_images"
 }
 
 func (c *ProductImage) BeforeCreate(tx *gorm.DB) (err error) {

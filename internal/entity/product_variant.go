@@ -22,7 +22,7 @@ type ProductVariant struct {
 }
 
 func (c *ProductVariant) TableName() string {
-	return "prouct_variants"
+	return "product_variants"
 }
 
 func (c *ProductVariant) BeforeCreate(tx *gorm.DB) (err error) {
