@@ -32,7 +32,7 @@ func (c *AdminController) Register(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.AdminUseCase.Create(ctx.UserContext(), request)
+	response, err := c.AdminUseCase.Create(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (c *AdminController) Login(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.AdminUseCase.Login(ctx.UserContext(), request)
+	response, err := c.AdminUseCase.Login(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}

@@ -39,7 +39,7 @@ func (c *CustomerAddressController) Create(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerAddressCase.Create(ctx.UserContext(), request)
+	response, err := c.CustomerAddressCase.Create(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (c *CustomerAddressController) Get(ctx fiber.Ctx) error {
 		CustomerID: auth.ID,
 	}
 
-	response, err := c.CustomerAddressCase.Get(ctx.UserContext(), request)
+	response, err := c.CustomerAddressCase.Get(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (c *CustomerAddressController) List(ctx fiber.Ctx) error {
 		CustomerID: auth.ID,
 	}
 
-	response, err := c.CustomerAddressCase.List(ctx.UserContext(), request)
+	response, err := c.CustomerAddressCase.List(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (c *CustomerAddressController) Update(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerAddressCase.Update(ctx.UserContext(), request)
+	response, err := c.CustomerAddressCase.Update(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (c *CustomerAddressController) Delete(ctx fiber.Ctx) error {
 		CustomerID: auth.ID,
 	}
 
-	err := c.CustomerAddressCase.Delete(ctx.UserContext(), request)
+	err := c.CustomerAddressCase.Delete(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}

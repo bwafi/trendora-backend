@@ -32,7 +32,7 @@ func (c *CustomerController) Register(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerCase.Create(ctx.UserContext(), request)
+	response, err := c.CustomerCase.Create(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (c *CustomerController) Login(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerCase.Login(ctx.UserContext(), request)
+	response, err := c.CustomerCase.Login(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (c *CustomerController) Update(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerCase.Update(ctx.UserContext(), request)
+	response, err := c.CustomerCase.Update(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (c *CustomerController) Delete(ctx fiber.Ctx) error {
 		})
 	}
 
-	response, err := c.CustomerCase.Delete(ctx.UserContext(), request)
+	response, err := c.CustomerCase.Delete(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
