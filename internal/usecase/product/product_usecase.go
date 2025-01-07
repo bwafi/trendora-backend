@@ -25,9 +25,10 @@ type ProductUseCase struct {
 	ProductImageRepository   *productrepo.ProductImageRepository
 	VariantImageRepository   *productrepo.VariantImageRepository
 	ProductVariantRepository *productrepo.ProductVariantRepository
+	ProductSizeRepository    *productrepo.ProductSizeRepository
 }
 
-func NewProductUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, cloudinary *cloudinary.Cloudinary, productRepo *productrepo.ProductRepository, categoryRepository *productrepo.CategoryRepository, productImageRepo *productrepo.ProductImageRepository, variantImageRepo *productrepo.VariantImageRepository, productVariantRepo *productrepo.ProductVariantRepository) *ProductUseCase {
+func NewProductUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Validate, cloudinary *cloudinary.Cloudinary, productRepo *productrepo.ProductRepository, categoryRepository *productrepo.CategoryRepository, productImageRepo *productrepo.ProductImageRepository, variantImageRepo *productrepo.VariantImageRepository, productVariantRepo *productrepo.ProductVariantRepository, productSizeRepo *productrepo.ProductSizeRepository) *ProductUseCase {
 	return &ProductUseCase{
 		DB:                       db,
 		Log:                      log,
@@ -38,6 +39,7 @@ func NewProductUseCase(db *gorm.DB, log *logrus.Logger, validate *validator.Vali
 		ProductImageRepository:   productImageRepo,
 		VariantImageRepository:   variantImageRepo,
 		ProductVariantRepository: productVariantRepo,
+		ProductSizeRepository:    productSizeRepo,
 	}
 }
 
@@ -102,17 +104,14 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 
 	var productVariants []*entity.ProductVariant
 	var variantImages []*entity.VariantImage
+	var productSizes []*entity.ProductSize
 	for _, variant := range request.ProductVariants {
 		productVariant := &entity.ProductVariant{
-			ProductId:     product.ID,
-			SKU:           variant.SKU,
-			ColorName:     variant.ColorName,
-			Size:          variant.Size,
-			Discount:      variant.Discount,
-			Price:         variant.Price,
-			StockQuantity: variant.StockQuantity,
-			Weight:        variant.Weight,
-			IsAvailable:   variant.IsAvailable,
+			ProductId:   product.ID,
+			SKU:         variant.SKU,
+			ColorName:   variant.ColorName,
+			Weight:      variant.Weight,
+			IsAvailable: variant.IsAvailable,
 		}
 
 		if err := c.ProductVariantRepository.Create(tx, productVariant); err != nil {
@@ -131,8 +130,27 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 			variantImages = append(variantImages, variantImage)
 		}
 
+		for _, size := range variant.ProductSizes {
+			productSize := &entity.ProductSize{
+				VariantId:     productVariant.ID,
+				SKU:           size.SKU,
+				Size:          size.Size,
+				Discount:      size.Discount,
+				Price:         size.Price,
+				StockQuantity: size.StockQuantity,
+				IsAvailable:   size.IsAvailable,
+			}
+
+			productSizes = append(productSizes, productSize)
+		}
+
 		if err := c.VariantImageRepository.BulkCreate(tx, variantImages); err != nil {
 			c.Log.Warnf("Failed create images variant  to database : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		if err := c.ProductSizeRepository.BulkCreate(tx, productSizes); err != nil {
+			c.Log.Warnf("Failed create size variant  to database : %+v", err)
 			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 		}
 
