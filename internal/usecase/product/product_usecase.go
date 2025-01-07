@@ -162,5 +162,5 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	return converter.ProductToResponse(product, productVariants, productImages, variantImages), nil
+	return converter.ProductToResponse(product, productVariants, productImages, variantImages, productSizes), nil
 }

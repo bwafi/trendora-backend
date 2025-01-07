@@ -5,7 +5,7 @@ import (
 	"github.com/bwafi/trendora-backend/internal/model"
 )
 
-func ProductToResponse(product *entity.Product, productVariants []*entity.ProductVariant, productImages []*entity.ProductImage, variantImages []*entity.VariantImage) *model.ProductResponse {
+func ProductToResponse(product *entity.Product, productVariants []*entity.ProductVariant, productImages []*entity.ProductImage, variantImages []*entity.VariantImage, productSizes []*entity.ProductSize) *model.ProductResponse {
 	productVariantSlice := make([]model.ProductVariantResponse, len(productVariants))
 
 	for i, variant := range productVariants {
@@ -20,15 +20,26 @@ func ProductToResponse(product *entity.Product, productVariants []*entity.Produc
 			}
 		}
 
+		sizes := make([]model.ProductSizeResponse, len(productSizes))
+
+		for i, size := range productSizes {
+			sizes[i] = model.ProductSizeResponse{
+				ID:            size.ID,
+				VariantId:     size.VariantId,
+				SKU:           size.SKU,
+				Size:          size.Size,
+				Discount:      size.Discount,
+				Price:         size.Price,
+				StockQuantity: size.StockQuantity,
+				IsAvailable:   size.IsAvailable,
+			}
+		}
+
 		productVariantSlice[i] = model.ProductVariantResponse{
 			ID:            variant.ID,
 			ProductId:     variant.ProductId,
 			SKU:           variant.SKU,
 			ColorName:     variant.ColorName,
-			Size:          variant.Size,
-			Discount:      variant.Discount,
-			Price:         variant.Price,
-			StockQuantity: variant.StockQuantity,
 			Weight:        variant.Weight,
 			IsAvailable:   variant.IsAvailable,
 			VariantImages: images,
