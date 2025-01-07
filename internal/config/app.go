@@ -36,11 +36,12 @@ func Bootstrap(config *BootstrapConfig) {
 	productImageRepository := productrepo.NewProductImageRepository(config.Log)
 	variantImageRepository := productrepo.NewVariantImageRepository(config.Log)
 	productVariantRepository := productrepo.NewProductVariantRepository(config.Log)
+	productSizeRepository := productrepo.NewProductSizeRepository(config.Log)
 	adminRepository := adminrepo.NewAdminrRepository(config.Log)
 
 	customerUseCase := customerusecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository, customerSessionRepository)
 	customerAddressUsecase := customerusecase.NewCustomerAddressUsecase(config.DB, config.Log, config.Validate, config.Config, customerAddressRepository)
-	productUseCase := productusecase.NewProductUseCase(config.DB, config.Log, config.Validate, config.Cloudinary, productRepository, categoryRepository, productImageRepository, variantImageRepository, productVariantRepository)
+	productUseCase := productusecase.NewProductUseCase(config.DB, config.Log, config.Validate, config.Cloudinary, productRepository, categoryRepository, productImageRepository, variantImageRepository, productVariantRepository, productSizeRepository)
 	adminUseCase := adminusecase.NewAdminUseCase(config.DB, config.Log, config.Validate, config.Config, adminRepository)
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log)
