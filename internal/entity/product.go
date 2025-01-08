@@ -20,8 +20,8 @@ type Product struct {
 	UpdatedAt     int64          `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 	DeletedAt     gorm.DeletedAt `gorm:"column:deleted_at;index"`
 
-	Category       Category         `gorm:"foreignKey:category_id;references:id"`
-	SubCategory    Category         `gorm:"foreignKey:sub_category_id;references:id"`
+	Category       *Category        `gorm:"foreignKey:category_id;references:id"`
+	SubCategory    *Category        `gorm:"foreignKey:sub_category_id;references:id"`
 	ProductImage   []ProductImage   `gorm:"foreignKey:product_id;references:id"`
 	ProductVariant []ProductVariant `gorm:"foreignKey:product_id;references:id"`
 }

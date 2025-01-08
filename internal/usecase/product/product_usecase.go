@@ -54,14 +54,14 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 		return nil, fiber.NewError(fiber.StatusBadRequest, message)
 	}
 
-	category := new(entity.Category)
-	if err := c.CategoryRepository.FindById(tx, category, request.CategoryId); err != nil {
+	category, err := c.CategoryRepository.ValidateCategoryExistence(tx, request.CategoryId)
+	if err != nil {
 		c.Log.Warnf("Category not found: %v", err)
-		return nil, fiber.NewError(fiber.StatusNotFound, "Category not found")
+		return nil, fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
-	subCategory := new(entity.Category)
-	if err := c.CategoryRepository.FindById(tx, subCategory, request.SubCategoryId); err != nil {
+	subCategory, err := c.CategoryRepository.ValidateCategoryExistence(tx, request.SubCategoryId)
+	if err != nil {
 		c.Log.Warnf("Sub category not found: %v", err)
 		return nil, fiber.NewError(fiber.StatusNotFound, "Sub category not found")
 	}
@@ -81,6 +81,9 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 		c.Log.Warnf("Failed create product  to database : %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
+
+	product.Category = category
+	product.SubCategory = subCategory
 
 	var productImages []*entity.ProductImage
 	for _, image := range request.ProductImages {
