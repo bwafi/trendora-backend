@@ -7,7 +7,7 @@ import (
 )
 
 type CartItemRepository struct {
-	repository.Repository[*entity.CartItem]
+	repository.Repository[entity.CartItem]
 	Log *logrus.Logger
 }
 
