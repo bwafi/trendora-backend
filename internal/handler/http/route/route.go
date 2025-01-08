@@ -11,6 +11,7 @@ type RouteConfig struct {
 	CustomerAddressController *http.CustomerAddressController
 	ProductController         *http.ProductController
 	AdminController           *http.AdminController
+	CartItemController        *http.CartItemController
 	CustomerAuthMiddleware    fiber.Handler
 	AdminAuthMiddleware       fiber.Handler
 }
@@ -41,12 +42,17 @@ func (c *RouteConfig) SetupAuthRoute() {
 	customerAuthRoutes.Patch("/", c.CustomerController.Update)
 	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
 
+	// Address route
 	addressRoutes := customerAuthRoutes.Group("/address")
 	addressRoutes.Post("/", c.CustomerAddressController.Create)
 	addressRoutes.Get("/", c.CustomerAddressController.List)
 	addressRoutes.Get("/:addressId", c.CustomerAddressController.Get)
 	addressRoutes.Patch("/:addressId", c.CustomerAddressController.Update)
 	addressRoutes.Delete("/:addressId", c.CustomerAddressController.Delete)
+
+	// Cart route
+	cartItemRoute := customerAuthRoutes.Group("/carts")
+	cartItemRoute.Post("/", c.CartItemController.Create)
 }
 
 func (c *RouteConfig) SetupAdminRoute() {
