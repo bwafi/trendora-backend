@@ -2,6 +2,7 @@ package productusecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
@@ -88,7 +89,7 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 	var productImages []*entity.ProductImage
 	for _, image := range request.ProductImages {
 
-		imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image)
+		imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image, product.ID, "")
 
 		productImage := &entity.ProductImage{
 			ProductId:    product.ID,
@@ -123,7 +124,8 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 		}
 
 		for _, image := range variant.VariantImages {
-			imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image)
+			prefixVariantImg := fmt.Sprintf("%s/%s", productVariant.ColorName, productVariant.ID)
+			imageUrl, _ := pkg.UploadToCloudinary(c.Cloudinary, ctx, image.Image, product.ID, prefixVariantImg)
 			variantImage := &entity.VariantImage{
 				VarianId:     productVariant.ID,
 				ImageUrl:     imageUrl,
