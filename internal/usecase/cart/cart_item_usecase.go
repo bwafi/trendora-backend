@@ -86,29 +86,35 @@ func (c *CartItemUseCase) Create(ctx context.Context, request *model.CartItemReq
 	}
 
 	// Check if exist increase quantity only
-	cartItemExist := new(entity.CartItem)
-	err := c.CartItemRepo.FindVariantId(tx, cartItemExist, request.VariantId)
+	cartItem := new(entity.CartItem)
+	err := c.CartItemRepo.FindVariantId(tx, cartItem, request.VariantId)
 
 	if err == nil {
-		cartItemExist.Quantity += request.Quantity
+		cartItem.Quantity += request.Quantity
 
-		if err := c.CartItemRepo.Update(tx, cartItemExist); err != nil {
+		if err := c.CartItemRepo.Update(tx, cartItem); err != nil {
 			c.Log.Warnf("Failed to add quantity to cart : %+v", err)
 			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 		}
 
-		return converter.CartItemToReponse(cartItemExist), err
-	}
+		// Check if err record not found
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
 
-	cartItem := &entity.CartItem{
-		CustomerId: request.CustomerId,
-		ProductId:  request.ProductId,
-		VariantId:  request.VariantId,
-		Quantity:   request.Quantity,
-	}
+		cartItem = &entity.CartItem{
+			CustomerId: request.CustomerId,
+			ProductId:  request.ProductId,
+			VariantId:  request.VariantId,
+			Quantity:   request.Quantity,
+		}
 
-	if err := c.CartItemRepo.Create(tx, cartItem); err != nil {
-		c.Log.Warnf("Failed to save to cart : %+v", err)
+		if err := c.CartItemRepo.Create(tx, cartItem); err != nil {
+			c.Log.Warnf("Failed to save to cart : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		// if err not record not found
+	} else {
+		c.Log.Warnf("Failed to find cart item: %+v", err)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 

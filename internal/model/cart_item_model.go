@@ -15,8 +15,8 @@ type CartItemResponse struct {
 }
 
 type CartItemRequest struct {
-	CustomerId string `json:"customer_id,omitempty"`
-	ProductId  string `json:"product_id,omitempty"`
-	VariantId  string `json:"variant_id,omitempty"`
-	Quantity   int    `json:"quantity,omitempty"`
+	CustomerId string `json:"customer_id,omitempty" validate:"required"`
+	ProductId  string `json:"product_id,omitempty" validate:"required"`
+	VariantId  string `json:"variant_id,omitempty" validate:"required"`
+	Quantity   int    `json:"quantity,omitempty" validate:"required,gte=1"`
 }
