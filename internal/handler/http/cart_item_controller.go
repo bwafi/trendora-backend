@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/bwafi/trendora-backend/internal/handler/middleware"
 	"github.com/bwafi/trendora-backend/internal/model"
 	cartusecase "github.com/bwafi/trendora-backend/internal/usecase/cart"
 	"github.com/gofiber/fiber/v3"
@@ -21,6 +22,9 @@ func NewCartItemController(log *logrus.Logger, CartItemUseCase *cartusecase.Cart
 
 func (c *CartItemController) Create(ctx fiber.Ctx) error {
 	request := new(model.CartItemRequest)
+	auth := middleware.GetUser(ctx)
+
+	request.CustomerId = auth.ID
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
