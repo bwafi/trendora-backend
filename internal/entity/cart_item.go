@@ -10,7 +10,7 @@ type CartItem struct {
 	CustomerId string `gorm:"column:customer_id;type:varchar(255);not null"`
 	ProductId  string `gorm:"column:product_id;type:varchar(255);not null"`
 	VariantId  string `gorm:"column:variant_id;type:varchar(255);not null"`
-	Quantity   int    `gorm:"column:quantity;not null"`
+	Quantity   int    `gorm:"column:quantity;not null;default:1"`
 	CreatedAt  int64  `gorm:"column:created_at;autoCreateTime:milli"`
 	UpdatedAt  int64  `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 
