@@ -85,6 +85,21 @@ func (c *CartItemUseCase) Create(ctx context.Context, request *model.CartItemReq
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
+	// Check if exist increase quantity only
+	cartItemExist := new(entity.CartItem)
+	err := c.CartItemRepo.FindVariantId(tx, cartItemExist, request.VariantId)
+
+	if err == nil {
+		cartItemExist.Quantity += request.Quantity
+
+		if err := c.CartItemRepo.Update(tx, cartItemExist); err != nil {
+			c.Log.Warnf("Failed to add quantity to cart : %+v", err)
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		}
+
+		return converter.CartItemToReponse(cartItemExist), err
+	}
+
 	cartItem := &entity.CartItem{
 		CustomerId: request.CustomerId,
 		ProductId:  request.ProductId,
