@@ -34,6 +34,12 @@ func ParseValidationErrors(err error) string {
 				message = fmt.Sprintf("%s is not valid email", CamelCaseToReadable(err.Field()))
 			case "required_without_phone", "required_without_email":
 				message = "Phone number or Email is required"
+			case "max":
+				message = fmt.Sprintf("%s must be less than or equal to %s", CamelCaseToReadable(err.Field()), err.Param())
+			case "min":
+				message = fmt.Sprintf("%s must be greater than or equal to %s", CamelCaseToReadable(err.Field()), err.Param())
+			case "gte":
+				message = fmt.Sprintf("%s must be greater than 0 or positive number", CamelCaseToReadable(err.Field()))
 			default:
 				message = fmt.Sprintf("something wrong on %s; %s", err.Field(), err.Tag())
 			}
