@@ -28,7 +28,7 @@ func (c *CartItemController) Create(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*string]{
 			Errors: &model.ErrorResponse{
 				Code:    fiber.StatusBadRequest,
 				Message: "Invalid request body",
@@ -54,7 +54,7 @@ func (c *CartItemController) Update(ctx fiber.Ctx) error {
 
 	if err := ctx.Bind().Body(request); err != nil {
 		c.Log.Warnf("Failed to parse request body : %+v", err)
-		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*string]{
 			Errors: &model.ErrorResponse{
 				Code:    fiber.StatusBadRequest,
 				Message: "Invalid request body",
