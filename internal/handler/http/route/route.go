@@ -53,6 +53,7 @@ func (c *RouteConfig) SetupAuthRoute() {
 	// Cart route
 	cartItemRoute := customerAuthRoutes.Group("/carts")
 	cartItemRoute.Post("/", c.CartItemController.Create)
+	cartItemRoute.Patch("/:cartId", c.CartItemController.Update)
 }
 
 func (c *RouteConfig) SetupAdminRoute() {

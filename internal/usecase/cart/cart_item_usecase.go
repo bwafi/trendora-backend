@@ -125,3 +125,35 @@ func (c *CartItemUseCase) Create(ctx context.Context, request *model.CartItemReq
 
 	return converter.CartItemToReponse(cartItem), nil
 }
+
+func (c *CartItemUseCase) Update(ctx context.Context, request *model.CartItemUpdateRequest) (*model.CartItemResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	cartItem := new(entity.CartItem)
+	if err := c.CartItemRepo.FindById(tx, cartItem, request.ID); err != nil {
+		c.Log.Warnf("Item with id %s not found", request.ID)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Cart Product not found")
+	}
+
+	cartItem.Quantity += request.Quantity
+
+	if err := c.CartItemRepo.Update(tx, cartItem); err != nil {
+		c.Log.Warnf("Failed Update Item with id %s", request.ID)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CartItemToReponse(cartItem), nil
+}

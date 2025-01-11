@@ -45,3 +45,29 @@ func (c *CartItemController) Create(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *CartItemController) Update(ctx fiber.Ctx) error {
+	request := new(model.CartItemUpdateRequest)
+	cartId := ctx.Params("cartId")
+
+	request.ID = cartId
+
+	if err := ctx.Bind().Body(request); err != nil {
+		c.Log.Warnf("Failed to parse request body : %+v", err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.CustomerResponse]{
+			Errors: &model.ErrorResponse{
+				Code:    fiber.StatusBadRequest,
+				Message: "Invalid request body",
+			},
+		})
+	}
+
+	response, err := c.CartItemUseCase.Update(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CartItemResponse]{
+		Data: response,
+	})
+}

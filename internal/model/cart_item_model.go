@@ -20,3 +20,8 @@ type CartItemRequest struct {
 	VariantId  string `json:"variant_id,omitempty" validate:"required"`
 	Quantity   int    `json:"quantity,omitempty" validate:"required,gte=1"`
 }
+
+type CartItemUpdateRequest struct {
+	ID       string `json:"id,omitempty" validate:"required"`
+	Quantity int    `json:"quantity,omitempty" validate:"required,gte=1"`
+}

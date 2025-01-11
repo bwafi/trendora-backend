@@ -18,6 +18,10 @@ func NewCartItemRepository(log *logrus.Logger) *CartItemRepository {
 	}
 }
 
-func (c *CartItemRepository) FindVariantId(tx *gorm.DB, cartItem *entity.CartItem, variantID string) error {
-	return tx.Where("variant_id = ?", variantID).Take(cartItem).Error
+func (c *CartItemRepository) FindById(tx *gorm.DB, entity *entity.CartItem, id string) error {
+	return tx.Where("id = ?", id).Take(entity).Error
+}
+
+func (c *CartItemRepository) FindVariantId(tx *gorm.DB, entity *entity.CartItem, variantID string) error {
+	return tx.Where("variant_id = ?", variantID).Take(entity).Error
 }
