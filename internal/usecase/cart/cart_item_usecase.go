@@ -143,7 +143,13 @@ func (c *CartItemUseCase) Update(ctx context.Context, request *model.CartItemUpd
 		return nil, fiber.NewError(fiber.StatusNotFound, "Cart Product not found")
 	}
 
-	cartItem.Quantity += request.Quantity
+	// Check if INCREASE
+	if request.Operation == "INCREASE" {
+		cartItem.Quantity += request.Quantity
+		fmt.Println(request.Quantity)
+	} else {
+		cartItem.Quantity -= request.Quantity
+	}
 
 	if err := c.CartItemRepo.Update(tx, cartItem); err != nil {
 		c.Log.Warnf("Failed Update Item with id %s", request.ID)
