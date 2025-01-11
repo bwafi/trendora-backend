@@ -71,3 +71,19 @@ func (c *CartItemController) Update(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *CartItemController) Delete(ctx fiber.Ctx) error {
+	request := new(model.CartItemDeleteRequest)
+	cartId := ctx.Params("cartId")
+
+	request.ID = cartId
+
+	err := c.CartItemUseCase.Delete(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Cart item successfully deleted",
+	})
+}

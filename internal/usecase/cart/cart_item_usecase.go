@@ -163,3 +163,32 @@ func (c *CartItemUseCase) Update(ctx context.Context, request *model.CartItemUpd
 
 	return converter.CartItemToReponse(cartItem), nil
 }
+
+func (c *CartItemUseCase) Delete(ctx context.Context, request *model.CartItemDeleteRequest) error {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	cartItem := new(entity.CartItem)
+	if err := c.CartItemRepo.FindById(tx, cartItem, request.ID); err != nil {
+		c.Log.Warnf("Item with id %s not found", request.ID)
+		return fiber.NewError(fiber.StatusNotFound, "Cart Product not found")
+	}
+
+	if err := c.CartItemRepo.Delete(tx, cartItem); err != nil {
+		c.Log.Warnf("Failed delete cart item in database : %+v", err)
+		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+	return nil
+}
