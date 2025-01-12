@@ -30,3 +30,8 @@ type CartItemUpdateRequest struct {
 type CartItemDeleteRequest struct {
 	ID string `json:"id,omitempty" validate:"required"`
 }
+
+type CartItemGetRequest struct {
+	ID         string `json:"id,omitempty" validate:"required"`
+	CustomerId string `json:"customer_id,omitempty" validate:"required"`
+}

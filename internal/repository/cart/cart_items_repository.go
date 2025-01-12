@@ -22,6 +22,18 @@ func (c *CartItemRepository) FindById(tx *gorm.DB, entity *entity.CartItem, id s
 	return tx.Where("id = ?", id).Take(entity).Error
 }
 
+func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.CartItem, id string, customerId string) error {
+	return tx.Debug().
+		Where("cart_items.id = ? AND cart_items.customer_id = ?", id, customerId).
+		Joins("Product").
+		Joins("Product.Category").
+		Joins("Product.SubCategory").
+		// TODO: used preload when one to many
+		// Joins("Product.ProductVariant[]").
+		// Joins("Product.ProductImage[]").
+		Take(entity).Error
+}
+
 func (c *CartItemRepository) FindVariantId(tx *gorm.DB, entity *entity.CartItem, variantID string) error {
 	return tx.Where("variant_id = ?", variantID).Take(entity).Error
 }

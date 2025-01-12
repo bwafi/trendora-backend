@@ -72,6 +72,25 @@ func (c *CartItemController) Update(ctx fiber.Ctx) error {
 	})
 }
 
+func (c *CartItemController) Get(ctx fiber.Ctx) error {
+	request := new(model.CartItemGetRequest)
+
+	cartId := ctx.Params("cartId")
+	customerId := middleware.GetUser(ctx)
+
+	request.CustomerId = customerId.ID
+	request.ID = cartId
+
+	response, err := c.CartItemUseCase.Get(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.CartItemResponse]{
+		Data: response,
+	})
+}
+
 func (c *CartItemController) Delete(ctx fiber.Ctx) error {
 	request := new(model.CartItemDeleteRequest)
 	cartId := ctx.Params("cartId")

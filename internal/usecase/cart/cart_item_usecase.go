@@ -164,6 +164,33 @@ func (c *CartItemUseCase) Update(ctx context.Context, request *model.CartItemUpd
 	return converter.CartItemToReponse(cartItem), nil
 }
 
+func (c *CartItemUseCase) Get(ctx context.Context, request *model.CartItemGetRequest) (*model.CartItemResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	cartItem := new(entity.CartItem)
+	if err := c.CartItemRepo.FindByIdAndCustomerId(tx, cartItem, request.ID, request.CustomerId); err != nil {
+		c.Log.Warnf("Failed get cart Item with id %s", request.ID)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	fmt.Printf("CartItem Product: %+v\n", cartItem.Product)
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.CartItemToReponse(cartItem), nil
+}
+
 func (c *CartItemUseCase) Delete(ctx context.Context, request *model.CartItemDeleteRequest) error {
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
