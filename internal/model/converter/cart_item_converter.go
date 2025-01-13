@@ -6,6 +6,18 @@ import (
 )
 
 func CartItemToReponse(cartItem *entity.CartItem) *model.CartItemResponse {
+	return &model.CartItemResponse{
+		ID:         cartItem.ID,
+		CustomerId: cartItem.CustomerId,
+		ProductId:  cartItem.ProductId,
+		VariantId:  cartItem.VariantId,
+		Quantity:   cartItem.Quantity,
+		CreatedAt:  cartItem.CreatedAt,
+		UpdatedAt:  cartItem.UpdatedAt,
+	}
+}
+
+func CartItemToGetReponse(cartItem *entity.CartItem) *model.CartItemResponse {
 	productVariants := make([]model.ProductVariantResponse, len(cartItem.Product.ProductVariant))
 
 	for i, variant := range cartItem.Product.ProductVariant {

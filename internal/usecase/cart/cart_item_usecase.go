@@ -188,7 +188,38 @@ func (c *CartItemUseCase) Get(ctx context.Context, request *model.CartItemGetReq
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
-	return converter.CartItemToReponse(cartItem), nil
+	return converter.CartItemToGetReponse(cartItem), nil
+}
+
+func (c *CartItemUseCase) List(ctx context.Context, request *model.CartItemGetListRequest) ([]*model.CartItemResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+
+	}
+
+	cartItems, err := c.CartItemRepo.FindAllByCustomerId(tx, request.CustomerId)
+	if err != nil {
+		c.Log.Warnf("Failed get list cart Item with customer id %s", request.CustomerId)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	responses := make([]*model.CartItemResponse, len(cartItems))
+	for i, response := range cartItems {
+		responses[i] = converter.CartItemToGetReponse(response)
+	}
+
+	return responses, nil
 }
 
 func (c *CartItemUseCase) Delete(ctx context.Context, request *model.CartItemDeleteRequest) error {

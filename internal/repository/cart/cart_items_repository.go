@@ -34,6 +34,25 @@ func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.C
 		Take(entity).Error
 }
 
+func (c *CartItemRepository) FindAllByCustomerId(tx *gorm.DB, customerId string) ([]*entity.CartItem, error) {
+	var cartItems []*entity.CartItem
+
+	err := tx.Debug().
+		Where("cart_items.customer_id = ?", customerId).
+		Joins("Product").
+		Joins("Product.Category").
+		Joins("Product.SubCategory").
+		Preload("Product.ProductVariant").
+		Preload("Product.ProductVariant.VariantImages").
+		Preload("Product.ProductVariant.ProductSizes").
+		Find(&cartItems).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return cartItems, nil
+}
+
 func (c *CartItemRepository) FindVariantId(tx *gorm.DB, entity *entity.CartItem, variantID string) error {
 	return tx.Where("variant_id = ?", variantID).Take(entity).Error
 }

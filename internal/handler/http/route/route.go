@@ -54,6 +54,7 @@ func (c *RouteConfig) SetupAuthRoute() {
 	cartItemRoute := customerAuthRoutes.Group("/carts")
 	cartItemRoute.Post("/", c.CartItemController.Create)
 	cartItemRoute.Get("/:cartId", c.CartItemController.Get)
+	cartItemRoute.Get("/", c.CartItemController.List)
 	cartItemRoute.Patch("/:cartId", c.CartItemController.Update)
 	cartItemRoute.Delete("/:cartId", c.CartItemController.Delete)
 }

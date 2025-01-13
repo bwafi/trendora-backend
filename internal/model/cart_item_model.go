@@ -35,3 +35,7 @@ type CartItemGetRequest struct {
 	ID         string `json:"id,omitempty" validate:"required"`
 	CustomerId string `json:"customer_id,omitempty" validate:"required"`
 }
+
+type CartItemGetListRequest struct {
+	CustomerId string `json:"customer_id,omitempty" validate:"required"`
+}
