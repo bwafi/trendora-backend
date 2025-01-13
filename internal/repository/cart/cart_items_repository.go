@@ -30,6 +30,7 @@ func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.C
 		Joins("Product.SubCategory").
 		Preload("Product.ProductVariant").
 		Preload("Product.ProductVariant.VariantImages").
+		Preload("Product.ProductVariant.ProductSizes").
 		Take(entity).Error
 }
 

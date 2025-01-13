@@ -15,6 +15,7 @@ type ProductVariant struct {
 
 	VariantImages []VariantImage `gorm:"foreignKey:variant_id;references:id"`
 	Product       Product        `gorm:"foreignKey:product_id;references:id"`
+	ProductSizes  []ProductSize  `gorm:"foreignKey:variant_id;references:id"`
 }
 
 func (c *ProductVariant) TableName() string {
