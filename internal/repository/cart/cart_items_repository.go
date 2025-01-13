@@ -23,7 +23,7 @@ func (c *CartItemRepository) FindById(tx *gorm.DB, entity *entity.CartItem, id s
 }
 
 func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.CartItem, id string, customerId string) error {
-	return tx.Debug().
+	return tx.
 		Where("cart_items.id = ? AND cart_items.customer_id = ?", id, customerId).
 		Joins("Product").
 		Joins("Product.Category").
@@ -37,7 +37,7 @@ func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.C
 func (c *CartItemRepository) FindAllByCustomerId(tx *gorm.DB, customerId string) ([]*entity.CartItem, error) {
 	var cartItems []*entity.CartItem
 
-	err := tx.Debug().
+	err := tx.
 		Where("cart_items.customer_id = ?", customerId).
 		Joins("Product").
 		Joins("Product.Category").
