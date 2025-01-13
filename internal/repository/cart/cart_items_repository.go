@@ -28,9 +28,8 @@ func (c *CartItemRepository) FindByIdAndCustomerId(tx *gorm.DB, entity *entity.C
 		Joins("Product").
 		Joins("Product.Category").
 		Joins("Product.SubCategory").
-		// TODO: used preload when one to many
-		// Joins("Product.ProductVariant[]").
-		// Joins("Product.ProductImage[]").
+		Preload("Product.ProductVariant").
+		Preload("Product.ProductVariant.VariantImages").
 		Take(entity).Error
 }
 
