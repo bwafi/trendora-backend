@@ -25,8 +25,19 @@ func NewDatabase(viper *viper.Viper, log *logrus.Logger) *gorm.DB {
 
 	// logger := logger.New(, )
 
+	gormLogger := &LogrusWriter{
+		Config: &logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			Colorful:      true,
+		},
+		Logger: log,
+	}
+
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=Asia/Jakarta", host, username, password, name, port, ssl)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: gormLogger,
+	})
 	if err != nil {
 		log.Fatalf("Failed error connect database: %v \n", err)
 	}
