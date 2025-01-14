@@ -18,13 +18,13 @@ func CartItemToReponse(cartItem *entity.CartItem) *model.CartItemResponse {
 }
 
 func CartItemToGetReponse(cartItem *entity.CartItem) *model.CartItemResponse {
-	productVariants := make([]model.ProductVariantResponse, len(cartItem.Product.ProductVariant))
+	productVariants := make([]*model.ProductVariantResponse, len(cartItem.Product.ProductVariant))
 
 	for i, variant := range cartItem.Product.ProductVariant {
-		variantImages := make([]model.ImageResponse, len(variant.VariantImages))
+		variantImages := make([]*model.ImageResponse, len(variant.VariantImages))
 
 		for i, image := range variant.VariantImages {
-			variantImages[i] = model.ImageResponse{
+			variantImages[i] = &model.ImageResponse{
 				ID:           image.ID,
 				VarianId:     image.VarianId,
 				ImageUrl:     image.ImageUrl,
@@ -32,9 +32,9 @@ func CartItemToGetReponse(cartItem *entity.CartItem) *model.CartItemResponse {
 			}
 		}
 
-		productSizes := make([]model.ProductSizeResponse, len(variant.ProductSizes))
+		productSizes := make([]*model.ProductSizeResponse, len(variant.ProductSizes))
 		for i, size := range variant.ProductSizes {
-			productSizes[i] = model.ProductSizeResponse{
+			productSizes[i] = &model.ProductSizeResponse{
 				ID:            size.ID,
 				VariantId:     size.VariantId,
 				SKU:           size.SKU,
@@ -46,7 +46,7 @@ func CartItemToGetReponse(cartItem *entity.CartItem) *model.CartItemResponse {
 			}
 		}
 
-		productVariants[i] = model.ProductVariantResponse{
+		productVariants[i] = &model.ProductVariantResponse{
 			ID:            variant.ID,
 			ProductId:     variant.ProductId,
 			SKU:           variant.SKU,
