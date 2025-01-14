@@ -192,11 +192,13 @@ func (c *ProductUseCase) Get(ctx context.Context, request *model.ProductGetReque
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
+	// Parsing productVariant to pointer
 	productVariants := make([]*entity.ProductVariant, len(product.ProductVariant))
 	for i := range product.ProductVariant {
 		productVariants[i] = &product.ProductVariant[i]
 	}
 
+	// Parsing productImages to pointer
 	productImages := make([]*entity.ProductImage, len(product.ProductImage))
 	for i := range product.ProductImage {
 		productImages[i] = &product.ProductImage[i]
@@ -227,6 +229,7 @@ func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetList
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
+	// Parsing to pointer
 	responses := make([]*model.ProductResponse, len(products))
 	for i, product := range products {
 		productVariants := make([]*entity.ProductVariant, len(product.ProductVariant))
