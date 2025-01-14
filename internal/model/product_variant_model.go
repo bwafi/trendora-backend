@@ -1,14 +1,14 @@
 package model
 
 type ProductVariantResponse struct {
-	ID            string                `json:"id"`
-	ProductId     string                `json:"product_id"`
-	SKU           string                `json:"sku"`
-	ColorName     string                `json:"color_name"`
-	Weight        float32               `json:"weight"`
-	IsAvailable   bool                  `json:"is_available"`
-	VariantImages []ImageResponse       `json:"variant_images"`
-	ProductSizes  []ProductSizeResponse `json:"product_sizes"`
+	ID            string                 `json:"id"`
+	ProductId     string                 `json:"product_id"`
+	SKU           string                 `json:"sku"`
+	ColorName     string                 `json:"color_name"`
+	Weight        float32                `json:"weight"`
+	IsAvailable   bool                   `json:"is_available"`
+	VariantImages []*ImageResponse       `json:"variant_images"`
+	ProductSizes  []*ProductSizeResponse `json:"product_sizes"`
 }
 
 type ProductVariantRequest struct {
