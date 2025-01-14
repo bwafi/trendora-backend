@@ -146,7 +146,6 @@ func (c *CartItemUseCase) Update(ctx context.Context, request *model.CartItemUpd
 	// Check if INCREASE
 	if request.Operation == "INCREASE" {
 		cartItem.Quantity += request.Quantity
-		fmt.Println(request.Quantity)
 	} else {
 		cartItem.Quantity -= request.Quantity
 	}
@@ -180,8 +179,6 @@ func (c *CartItemUseCase) Get(ctx context.Context, request *model.CartItemGetReq
 		c.Log.Warnf("Failed get cart Item with id %s", request.ID)
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
-
-	fmt.Printf("CartItem Product: %+v\n", cartItem.Product)
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)

@@ -2,7 +2,6 @@ package customerusecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
@@ -84,8 +83,6 @@ func (c *CustomerAddressUsecase) Get(ctx context.Context, request *model.GetAddr
 	}
 
 	customerAddress := new(entity.CustomerAddresses)
-
-	fmt.Println("customer id nih", request.ID)
 
 	if err := c.CustomerAddressRepository.FindByIdAndCustomerId(tx, customerAddress, request.ID, request.CustomerID); err != nil {
 		c.Log.Warnf("Failed Find customer in database : %+v", err)
