@@ -40,7 +40,6 @@ func (c *ProductRepository) FindAllProducts(tx *gorm.DB, request *model.ProductG
 		Preload("ProductVariant.VariantImages").
 		Preload("ProductVariant.ProductSizes")
 
-	// Contoh: Filtering berdasarkan request
 	if request.CategoryId != "" {
 		query = query.Where("products.category_id = ?", request.CategoryId)
 	}
@@ -49,6 +48,10 @@ func (c *ProductRepository) FindAllProducts(tx *gorm.DB, request *model.ProductG
 	}
 	if request.Name != "" {
 		query = query.Where("products.name ILIKE ?", "%"+request.Name+"%")
+	}
+
+	if request.Gender != "" {
+		query = query.Where("products.gender = ?", request.Gender)
 	}
 
 	err := query.Find(&products).Error
