@@ -34,7 +34,7 @@ func (c *RouteConfig) SetupGuestRoute() {
 	// Public Product Routes (Accessible to both Admin and Customer)
 	productRoutes := c.App.Group("/api/products")
 	productRoutes.Get("/:productId", c.ProductController.Get)
-	// productRoutes.Get("/", c.ProductController.List)
+	productRoutes.Get("/", c.ProductController.List)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {

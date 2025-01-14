@@ -36,3 +36,11 @@ type CreateProductRequest struct {
 type ProductGetRequest struct {
 	ID string `json:"id,omitempty"`
 }
+
+type ProductGetListRequest struct {
+	ID            string `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	Gender        string `json:"gender,omitempty"`
+	CategoryId    string `json:"category_id,omitempty"`
+	SubCategoryId string `json:"sub_category_id,omitempty"`
+}

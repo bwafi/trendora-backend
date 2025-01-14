@@ -79,3 +79,22 @@ func (c *ProductController) Get(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *ProductController) List(ctx fiber.Ctx) error {
+	queries := ctx.Queries()
+	request := &model.ProductGetListRequest{
+		Name:          queries["name"],
+		Gender:        queries["gender"],
+		CategoryId:    queries["category_id"],
+		SubCategoryId: queries["sub_category_id"],
+	}
+
+	responses, err := c.ProductUseCase.List(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[[]*model.ProductResponse]{
+		Data: responses,
+	})
+}

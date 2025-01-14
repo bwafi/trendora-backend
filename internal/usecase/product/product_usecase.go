@@ -205,6 +205,47 @@ func (c *ProductUseCase) Get(ctx context.Context, request *model.ProductGetReque
 	return converter.ProductToResponse(product, productVariants, productImages, getVariantImages(productVariants), getProductSizes(productVariants)), nil
 }
 
+func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetListRequest) ([]*model.ProductResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	products, err := c.ProductRepository.FindAllProducts(tx, request)
+	if err != nil {
+		c.Log.Warnf("No products found for parameters: %+v", request)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	responses := make([]*model.ProductResponse, len(products))
+	for i, product := range products {
+		productVariants := make([]*entity.ProductVariant, len(product.ProductVariant))
+
+		for j, variant := range product.ProductVariant {
+			productVariants[j] = &variant
+		}
+
+		productImages := make([]*entity.ProductImage, len(product.ProductImage))
+		for j, productImage := range product.ProductImage {
+			productImages[j] = &productImage
+		}
+
+		responses[i] = converter.ProductToResponse(product, productVariants, productImages, getVariantImages(productVariants), getProductSizes(productVariants))
+	}
+
+	return responses, nil
+}
+
 func getVariantImages(productVariants []*entity.ProductVariant) []*entity.VariantImage {
 	var variantImages []*entity.VariantImage
 	for _, variant := range productVariants {
