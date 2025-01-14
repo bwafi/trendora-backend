@@ -63,3 +63,19 @@ func (c *ProductController) Create(ctx fiber.Ctx) error {
 		Data: response,
 	})
 }
+
+func (c *ProductController) Get(ctx fiber.Ctx) error {
+	request := new(model.ProductGetRequest)
+	productId := ctx.Params("productId")
+
+	request.ID = productId
+
+	response, err := c.ProductUseCase.Get(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.ProductResponse]{
+		Data: response,
+	})
+}

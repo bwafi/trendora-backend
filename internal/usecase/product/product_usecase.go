@@ -169,3 +169,58 @@ func (c *ProductUseCase) Create(ctx context.Context, request *model.CreateProduc
 
 	return converter.ProductToResponse(product, productVariants, productImages, variantImages, productSizes), nil
 }
+
+func (c *ProductUseCase) Get(ctx context.Context, request *model.ProductGetRequest) (*model.ProductResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+
+		message := pkg.ParseValidationErrors(err)
+		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+	}
+
+	product := new(entity.Product)
+	if err := c.ProductRepository.FindDetailsProduct(tx, product, request.ID); err != nil {
+		c.Log.Warnf("Product with id %s not found", request.ID)
+		return nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	productVariants := make([]*entity.ProductVariant, len(product.ProductVariant))
+	for i := range product.ProductVariant {
+		productVariants[i] = &product.ProductVariant[i]
+	}
+
+	productImages := make([]*entity.ProductImage, len(product.ProductImage))
+	for i := range product.ProductImage {
+		productImages[i] = &product.ProductImage[i]
+	}
+
+	return converter.ProductToResponse(product, productVariants, productImages, getVariantImages(productVariants), getProductSizes(productVariants)), nil
+}
+
+func getVariantImages(productVariants []*entity.ProductVariant) []*entity.VariantImage {
+	var variantImages []*entity.VariantImage
+	for _, variant := range productVariants {
+		for i := range variant.VariantImages {
+			variantImages = append(variantImages, &variant.VariantImages[i])
+		}
+	}
+	return variantImages
+}
+
+func getProductSizes(productVariants []*entity.ProductVariant) []*entity.ProductSize {
+	var productSizes []*entity.ProductSize
+	for _, variant := range productVariants {
+		for i := range variant.ProductSizes {
+			productSizes = append(productSizes, &variant.ProductSizes[i])
+		}
+	}
+	return productSizes
+}

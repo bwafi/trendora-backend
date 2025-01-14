@@ -32,14 +32,15 @@ func (c *RouteConfig) SetupGuestRoute() {
 	adminRoutes.Post("/login", c.AdminController.Login)
 
 	// Public Product Routes (Accessible to both Admin and Customer)
-	// productRoutes := c.App.Group("/api/products")
-	// productRoutes.Get("/", c.ProductController.List)          // List Products (Shared Route)
-	// productRoutes.Get("/:productId", c.ProductController.Get) // View a specific Product (Shared Route)
+	productRoutes := c.App.Group("/api/products")
+	productRoutes.Get("/:productId", c.ProductController.Get)
+	// productRoutes.Get("/", c.ProductController.List)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
 	customerAuthRoutes := c.App.Group("/api/customers", c.CustomerAuthMiddleware)
 	customerAuthRoutes.Patch("/", c.CustomerController.Update)
+	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
 	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
 
 	// Address route
