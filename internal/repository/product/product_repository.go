@@ -1,6 +1,9 @@
 package productrepo
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/bwafi/trendora-backend/internal/entity"
 	"github.com/bwafi/trendora-backend/internal/model"
 	"github.com/bwafi/trendora-backend/internal/repository"
@@ -30,10 +33,12 @@ func (c *ProductRepository) FindDetailsProduct(tx *gorm.DB, product *entity.Prod
 		Take(product).Error
 }
 
-func (c *ProductRepository) FindAllProducts(tx *gorm.DB, request *model.ProductGetListRequest) ([]*entity.Product, error) {
+func (c *ProductRepository) FindAllProducts(tx *gorm.DB, request *model.ProductGetListRequest) ([]*entity.Product, *model.PageMetadata, error) {
 	var products []*entity.Product
+	var totalItems int64
 
 	query := tx.
+		Debug().
 		Joins("Category").
 		Joins("SubCategory").
 		Preload("ProductVariant").
@@ -54,10 +59,40 @@ func (c *ProductRepository) FindAllProducts(tx *gorm.DB, request *model.ProductG
 		query = query.Where("products.gender = ?", request.Gender)
 	}
 
-	err := query.Find(&products).Error
+	err := query.Model(&entity.Product{}).Count(&totalItems).Error
+	fmt.Println("Error counting total items:", err)
 	if err != nil {
-		return nil, err
+		fmt.Println("Error counting total items:", err)
+		return nil, nil, err
 	}
 
-	return products, nil
+	pageSize := 10
+	if request.Limit > 0 {
+		pageSize = request.Limit
+	}
+
+	currentPage := 1
+	if request.Page > 0 {
+		currentPage = request.Page
+	}
+
+	totalPages := int64(math.Ceil(float64(totalItems) / float64(pageSize)))
+
+	offset := (currentPage - 1) * pageSize
+	err = query.
+		Limit(pageSize).
+		Offset(offset).
+		Find(&products).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pagination := &model.PageMetadata{
+		Page:       pageSize,
+		Size:       pageSize,
+		TotalItem:  totalItems,
+		TotalPages: totalPages,
+	}
+
+	return products, pagination, nil
 }
