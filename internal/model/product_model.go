@@ -43,4 +43,6 @@ type ProductGetListRequest struct {
 	Gender        string `json:"gender,omitempty"`
 	CategoryId    string `json:"category_id,omitempty"`
 	SubCategoryId string `json:"sub_category_id,omitempty"`
+	Limit         int    `json:"limit,omitempty"`
+	Page          int    `json:"page,omitempty"`
 }
