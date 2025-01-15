@@ -207,7 +207,7 @@ func (c *ProductUseCase) Get(ctx context.Context, request *model.ProductGetReque
 	return converter.ProductToResponse(product, productVariants, productImages, getVariantImages(productVariants), getProductSizes(productVariants)), nil
 }
 
-func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetListRequest) ([]*model.ProductResponse, error) {
+func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetListRequest) ([]*model.ProductResponse, *model.PageMetadata, error) {
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
@@ -215,18 +215,19 @@ func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetList
 		c.Log.Warnf("Invalid request body : %+v", err)
 
 		message := pkg.ParseValidationErrors(err)
-		return nil, fiber.NewError(fiber.StatusBadRequest, message)
+		return nil, nil, fiber.NewError(fiber.StatusBadRequest, message)
 	}
 
-	products, err := c.ProductRepository.FindAllProducts(tx, request)
+	products, pagination, err := c.ProductRepository.FindAllProducts(tx, request)
+	fmt.Println("product: ", products)
 	if err != nil {
 		c.Log.Warnf("No products found for parameters: %+v", request)
-		return nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
+		return nil, nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+		return nil, nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
 	}
 
 	// Parsing to pointer
@@ -246,7 +247,7 @@ func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetList
 		responses[i] = converter.ProductToResponse(product, productVariants, productImages, getVariantImages(productVariants), getProductSizes(productVariants))
 	}
 
-	return responses, nil
+	return responses, pagination, nil
 }
 
 func getVariantImages(productVariants []*entity.ProductVariant) []*entity.VariantImage {

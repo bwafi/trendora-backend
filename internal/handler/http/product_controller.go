@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/bwafi/trendora-backend/internal/model"
 	productusecase "github.com/bwafi/trendora-backend/internal/usecase/product"
@@ -82,19 +83,34 @@ func (c *ProductController) Get(ctx fiber.Ctx) error {
 
 func (c *ProductController) List(ctx fiber.Ctx) error {
 	queries := ctx.Queries()
+
+	page, err := strconv.Atoi(queries["page"])
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(queries["limit"])
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+
 	request := &model.ProductGetListRequest{
+		ID:            "",
 		Name:          queries["name"],
 		Gender:        queries["gender"],
 		CategoryId:    queries["category_id"],
 		SubCategoryId: queries["sub_category_id"],
+		Limit:         limit,
+		Page:          page,
 	}
 
-	responses, err := c.ProductUseCase.List(ctx.RequestCtx(), request)
+	responses, pagination, err := c.ProductUseCase.List(ctx.RequestCtx(), request)
 	if err != nil {
 		return err
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[[]*model.ProductResponse]{
-		Data: responses,
+		Data:   responses,
+		Paging: pagination,
 	})
 }
