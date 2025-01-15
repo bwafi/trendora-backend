@@ -183,6 +183,7 @@ func (c *ProductUseCase) Get(ctx context.Context, request *model.ProductGetReque
 
 	product := new(entity.Product)
 	if err := c.ProductRepository.FindDetailsProduct(tx, product, request.ID); err != nil {
+		c.Log.Warnf("Failed to get list product with error :", request.ID)
 		c.Log.Warnf("Product with id %s not found", request.ID)
 		return nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
 	}
