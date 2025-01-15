@@ -12,10 +12,10 @@ type PageResponse[T any] struct {
 }
 
 type PageMetadata struct {
-	Page      int   `json:"page"`
-	Size      int   `json:"size"`
-	TotalItem int64 `json:"total_item"`
-	TotalPage int64 `json:"total_page"`
+	Page       int   `json:"page"`
+	Size       int   `json:"size"`
+	TotalItem  int64 `json:"total_item"`
+	TotalPages int64 `json:"total_page"`
 }
 
 type ErrorResponse struct {
