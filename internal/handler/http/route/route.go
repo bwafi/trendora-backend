@@ -42,7 +42,6 @@ func (c *RouteConfig) SetupAuthRoute() {
 	customerAuthRoutes := c.App.Group("/api/customers", c.CustomerAuthMiddleware)
 	customerAuthRoutes.Patch("/", c.CustomerController.Update)
 	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
-	customerAuthRoutes.Delete("/", c.CustomerController.Delete)
 
 	// Address route
 	addressRoutes := customerAuthRoutes.Group("/address")
