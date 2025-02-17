@@ -41,6 +41,7 @@ func Bootstrap(config *BootstrapConfig) {
 	variantImageRepository := productrepo.NewVariantImageRepository(config.Log)
 	productVariantRepository := productrepo.NewProductVariantRepository(config.Log)
 	productSizeRepository := productrepo.NewProductSizeRepository(config.Log)
+	productReviewRepository := productrepo.NewProductReviewRepository(config.Log)
 
 	cartItemRepo := cartrepo.NewCartItemRepository(config.Log)
 
@@ -52,12 +53,14 @@ func Bootstrap(config *BootstrapConfig) {
 	productUseCase := productusecase.NewProductUseCase(config.DB, config.Log, config.Validate, config.Cloudinary, productRepository, categoryRepository, productImageRepository, variantImageRepository, productVariantRepository, productSizeRepository)
 	cartItemUseCase := cartusecase.NewCartItemUseCase(config.DB, config.Log, config.Validate, cartItemRepo, customerRepository, productRepository, productVariantRepository)
 	adminUseCase := adminusecase.NewAdminUseCase(config.DB, config.Log, config.Validate, config.Config, adminRepository)
+	productReviewUseCase := productusecase.NewProductReviewUsecase(config.DB, config.Log, config.Validate, productReviewRepository, productRepository, customerRepository)
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log)
 	cusomerAddressController := http.NewCustomerAddressController(customerAddressUsecase, config.Log, config.Config)
 	productController := http.NewProductController(productUseCase, config.Log)
 	cartItemController := http.NewCartItemController(config.Log, cartItemUseCase)
 	adminController := http.NewAdminUseCase(adminUseCase, config.Log)
+	productReviewController := http.NewProductReviewController(productReviewUseCase, config.Log)
 
 	customerAuthMiddleware := middleware.CustomerAuthMiddleware(customerUseCase)
 	adminAuthMiddleware := middleware.AdminAuthMiddleware(adminUseCase)
@@ -69,6 +72,7 @@ func Bootstrap(config *BootstrapConfig) {
 		ProductController:         productController,
 		AdminController:           adminController,
 		CartItemController:        cartItemController,
+		ProductReviewController:   productReviewController,
 		CustomerAuthMiddleware:    customerAuthMiddleware,
 		AdminAuthMiddleware:       adminAuthMiddleware,
 	}

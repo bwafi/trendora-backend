@@ -12,6 +12,7 @@ type RouteConfig struct {
 	ProductController         *http.ProductController
 	AdminController           *http.AdminController
 	CartItemController        *http.CartItemController
+	ProductReviewController   *http.ProductReviewController
 	CustomerAuthMiddleware    fiber.Handler
 	AdminAuthMiddleware       fiber.Handler
 }
@@ -58,6 +59,10 @@ func (c *RouteConfig) SetupAuthRoute() {
 	cartItemRoute.Get("/", c.CartItemController.List)
 	cartItemRoute.Patch("/:cartId", c.CartItemController.Update)
 	cartItemRoute.Delete("/:cartId", c.CartItemController.Delete)
+
+	// Product
+	productCustomerAuthRoutes := c.App.Group("/api/products", c.CustomerAuthMiddleware)
+	productCustomerAuthRoutes.Post("/reviews", c.ProductReviewController.Create)
 }
 
 func (c *RouteConfig) SetupAdminRoute() {
