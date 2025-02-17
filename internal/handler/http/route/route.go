@@ -66,5 +66,6 @@ func (c *RouteConfig) SetupAdminRoute() {
 
 	// Admin product routes (for creating and managing products)
 	adminProductRoutes := adminRoutes.Group("/products")
-	adminProductRoutes.Post("/", c.ProductController.Create) // Create Product (Admin-only)
+	adminProductRoutes.Post("/", c.ProductController.Create)
+	adminProductRoutes.Patch("/:productId", c.ProductController.RecordView)
 }

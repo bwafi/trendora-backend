@@ -114,3 +114,19 @@ func (c *ProductController) List(ctx fiber.Ctx) error {
 		Paging: pagination,
 	})
 }
+
+func (c *ProductController) RecordView(ctx fiber.Ctx) error {
+	request := new(model.ProductViewRequest)
+	requestId := ctx.Params("productId")
+
+	request.ID = requestId
+
+	response, err := c.ProductUseCase.RecordView(ctx.RequestCtx(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.ProductResponse]{
+		Data: response,
+	})
+}

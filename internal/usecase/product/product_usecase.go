@@ -251,6 +251,28 @@ func (c *ProductUseCase) List(ctx context.Context, request *model.ProductGetList
 	return responses, pagination, nil
 }
 
+func (c *ProductUseCase) RecordView(ctx context.Context, request *model.ProductViewRequest) (*model.ProductResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	product := new(entity.Product)
+	if err := c.ProductRepository.FindById(tx, product, request.ID); err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "Product not found")
+	}
+
+	product.ViewCount = product.ViewCount + 1
+	if err := c.ProductRepository.Update(tx, product); err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	return converter.ProductToResponse(product, nil, nil, nil, nil), nil
+}
+
 func getVariantImages(productVariants []*entity.ProductVariant) []*entity.VariantImage {
 	var variantImages []*entity.VariantImage
 	for _, variant := range productVariants {

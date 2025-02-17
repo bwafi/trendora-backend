@@ -46,3 +46,7 @@ type ProductGetListRequest struct {
 	Limit         int    `json:"limit,omitempty"`
 	Page          int    `json:"page,omitempty"`
 }
+
+type ProductViewRequest struct {
+	ID string `json:"id,omitempty"`
+}
