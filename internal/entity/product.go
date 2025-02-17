@@ -14,6 +14,7 @@ type Product struct {
 	CategoryId    string         `gorm:"column:category_id;type:varchar(255)"`
 	SubCategoryId string         `gorm:"column:sub_category_id;type:varchar(255)"`
 	BasePrice     float32        `gorm:"column:base_price;type:decimal(10,2)"`
+	ViewCount     int64          `gorm:"column:view_count;type:bigint"`
 	IsVisible     bool           `gorm:"column:is_visible;type:bool;default:true"`
 	ReleaseDate   int64          `gorm:"column:release_date;type:bigint"`
 	CreatedAt     int64          `gorm:"column:created_at;autoCreateTime:milli"`

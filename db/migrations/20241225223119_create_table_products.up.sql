@@ -7,6 +7,7 @@ CREATE TABLE products (
   category_id VARCHAR(255),
   sub_category_id VARCHAR(255),
   base_price DECIMAL(10,2),
+  view_count BIGINT,
   is_visible BOOLEAN,
   release_date BIGINT,
   created_at BIGINT,
