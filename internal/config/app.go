@@ -49,14 +49,14 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// Usecase
 	customerUseCase := customerusecase.NewCustomerUseCase(config.DB, config.Log, config.Validate, config.Config, customerRepository, customerSessionRepository)
-	customerAddressUsecase := customerusecase.NewCustomerAddressUsecase(config.DB, config.Log, config.Validate, config.Config, customerAddressRepository)
+	customerAddressUseCase := customerusecase.NewCustomerAddressUsecase(config.DB, config.Log, config.Validate, config.Config, customerAddressRepository)
 	productUseCase := productusecase.NewProductUseCase(config.DB, config.Log, config.Validate, config.Cloudinary, productRepository, categoryRepository, productImageRepository, variantImageRepository, productVariantRepository, productSizeRepository)
 	cartItemUseCase := cartusecase.NewCartItemUseCase(config.DB, config.Log, config.Validate, cartItemRepo, customerRepository, productRepository, productVariantRepository)
 	adminUseCase := adminusecase.NewAdminUseCase(config.DB, config.Log, config.Validate, config.Config, adminRepository)
 	productReviewUseCase := productusecase.NewProductReviewUsecase(config.DB, config.Log, config.Validate, productReviewRepository, productRepository, customerRepository)
 
 	customerController := http.NewCustomerController(customerUseCase, config.Log)
-	cusomerAddressController := http.NewCustomerAddressController(customerAddressUsecase, config.Log, config.Config)
+	cusomerAddressController := http.NewCustomerAddressController(customerAddressUseCase, config.Log, config.Config)
 	productController := http.NewProductController(productUseCase, config.Log)
 	cartItemController := http.NewCartItemController(config.Log, cartItemUseCase)
 	adminController := http.NewAdminUseCase(adminUseCase, config.Log)
